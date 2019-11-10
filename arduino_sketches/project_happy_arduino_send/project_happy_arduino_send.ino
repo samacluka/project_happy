@@ -97,11 +97,12 @@ void httpRequest() {
   if (return_val) {
     Serial.println("connecting...");
     // send the HTTP PUT request:
-    client.println("POST /getsensor HTTP/1.1");
+    client.println("POST /postRoute HTTP/1.1");
     client.println("Host: projecthappy.herokuapp.com");
     client.println("User-Agent: ArduinoWiFi/1.1");
     client.println("Content-Type: application/x-www-form-urlencoded");
-    client.println("Content-Length: 100");
+//    client.println("Content-Type: text-plain");
+    client.println("Content-Length: 21");
     client.println("Connection: close");
     client.println();
     client.println("field1=0&field2=butts");
