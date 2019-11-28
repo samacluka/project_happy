@@ -105,7 +105,7 @@ void httpRequest() {
     client.println("Content-Length: 21");
     client.println("Connection: close");
     client.println();
-    client.println("field1=0&field2=butts");
+    client.println("field1=0&field2=hello");
     
     
     //client.println();

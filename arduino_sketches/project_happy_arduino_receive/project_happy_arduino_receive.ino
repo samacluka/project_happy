@@ -97,9 +97,10 @@ void httpRequest() {
   if (return_val) {
     Serial.println("connecting...");
     // send the HTTP PUT request:
-    client.println("GET /index HTTP/1.1");
+    client.println("GET /test HTTP/1.1");
     client.println("Host: projecthappy.herokuapp.com");
     client.println("User-Agent: ArduinoWiFi/1.1");
+    client.println("Cache-Control: must-revalidate");
     client.println("Connection: close");
     client.println();
 
