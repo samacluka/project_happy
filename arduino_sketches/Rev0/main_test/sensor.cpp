@@ -5,7 +5,7 @@
 
 DHT dht(TEMP_HUM_PIN, DHTTYPE);
 
-sensor::sensor()
+sensor::sensor(int num)
 {
   pinMode(TEMP_HUM_PIN, INPUT);
   
@@ -16,29 +16,29 @@ sensor::sensor()
   pinMode(LIGHT_SENSE_PIN, INPUT);
 }
 
-sensor::init()
+void sensor::init()
 {
   dht.begin();
 }
 
-sensor::getTempHum(float &temp, float &humidity)
+void sensor::getTempHum(float &temp, float &humidity)
 {
   temp = dht.readTemperature();
 
   humidity = dht.readHumidity();
 }
 
-sensor::getSoilMoist(int &soil_moist)
+void sensor::getSoilMoist(int &soil_moist)
 {
   
 }
 
-sensor::getWaterLevel(bool &water_present)
+void sensor::getWaterLevel(int &water_present)
 {
   water_present = digitalRead(WATER_LEVEL_PIN);
 }
 
-sensor::getHowMuchLight(int &light)
+void sensor::getHowMuchLight(int &light)
 {
-  light = analogRead(LIGHT_SENSE_PIN)
+  light = analogRead(LIGHT_SENSE_PIN);
 }
