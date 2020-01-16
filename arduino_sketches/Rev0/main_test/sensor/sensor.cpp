@@ -14,6 +14,8 @@ sensor::sensor(int num)
   pinMode(WATER_LEVEL_PIN, INPUT);
 
   pinMode(LIGHT_SENSE_PIN, INPUT);
+
+  attachInterrupt(digitalPinToInterrupt(SOIL_MOIST_PIN), waterISR, LOW);
 }
 
 void sensor::init()
@@ -30,8 +32,8 @@ void sensor::getTempHum(float &temp, float &humidity)
 
 void sensor::getSoilMoist(int &soil_moist)
 {
-  
-}
+  soil_moist = analogRead(SOIL_MOIST_PIN);
+}	
 
 void sensor::getWaterLevel(int &water_present)
 {
@@ -41,4 +43,9 @@ void sensor::getWaterLevel(int &water_present)
 void sensor::getHowMuchLight(int &light)
 {
   light = analogRead(LIGHT_SENSE_PIN);
+}
+
+void sensor::waterISR()
+{
+	Serial.print("HELLO I AM THE WATER ISR FEAR ME!");
 }
