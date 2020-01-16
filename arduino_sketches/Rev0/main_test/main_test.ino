@@ -21,6 +21,11 @@ void loop()
   Serial.println(temperature, DEC);
   Serial.print("humidity = ");
   Serial.println(humidity, DEC);
+
+  int dryness_of_soil;
+  my_sensor.getSoilMoist(dryness_of_soil);
+  Serial.print("soil moisture = ");
+  Serial.println(dryness_of_soil, DEC);
   
   int is_water_present;
   my_sensor.getWaterLevel(is_water_present);
