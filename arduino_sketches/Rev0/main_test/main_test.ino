@@ -19,15 +19,8 @@
 //char server[] = "projecthappy.herokuapp.com";
 //unsigned long lastConnectionTime = 0;
 //const unsigned long postingInterval = 10L * 1000L;
-volatile boolean water_ISR_flag = true;
 
 /*----------------------------------------- MAIN -----------------------------------------*/
-
-void waterISR()
-{
-    water_ISR_flag = !water_ISR_flag;  
-    // digitalWrite(LED_BUILTIN,HIGH);
-}
 
 void setup()
 {
@@ -38,8 +31,7 @@ void setup()
 }
 
 void loop()
-{
-    attachInterrupt(digitalPinToInterrupt(WATER_LEVEL_PIN), waterISR, CHANGE);
+{    
     float temperature;
     float humidity;
     int dryness_of_soil;
@@ -68,32 +60,19 @@ void loop()
     Serial.println(is_water_present, DEC);
     Serial.print("light_value= ");
     Serial.println(light_value, DEC);
-    Serial.print("water ISR flag = ");
-    Serial.println(water_ISR_flag);
     
     // Logic for turning on pump if the moisture detector is low
-    if (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3))
-    {
-        my_actuator.enablePump();
-        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-
-        do
-        {
-            Serial.println("I am pumping.");
-            delay(1000);
-        }while(water_ISR_flag);
-
-        water_ISR_flag = false;
-        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-        my_actuator.disablePump();
-        delay(1000);
-    }
-
-    //if(water_ISR_flag)  {
-    //    digitalWrite(LED_BUILTIN,LOW);
-    //   
-    //   water_ISR_flag =  0;
-    //}
+//    if (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3))
+//    {
+//        my_actuator.enablePump();
+//        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//
+//        delay(2000);
+//
+//        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//        my_actuator.disablePump();
+//        delay(1000);
+//    }
 
     delay(2000);
 }
