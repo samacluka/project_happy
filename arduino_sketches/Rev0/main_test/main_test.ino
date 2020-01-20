@@ -60,8 +60,6 @@ void loop()
     Serial.println(is_water_present, DEC);
     Serial.print("light_value= ");
     Serial.println(light_value, DEC);
-    Serial.print("water ISR flag = ");
-    Serial.println(water_ISR_flag);
     
     // Logic for turning on pump if the moisture detector is low
 //    if (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3))
