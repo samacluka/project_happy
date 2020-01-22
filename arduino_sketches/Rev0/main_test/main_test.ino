@@ -1,3 +1,5 @@
+#include <TimedAction.h>
+
 /*--------------------------------------- INCLUDES ---------------------------------------*/
 #include <sensor.h>
 #include <actuator.h>
@@ -41,77 +43,79 @@ int pump_thread_active = 0;
 sensor my_sensor(0);
 actuator my_actuator(0);
 
+TimedAction pumpAction = TimedAction(500, pump);
+
 /*----------------------------------------- MAIN -----------------------------------------*/
 
 void setup()
 {
-  Serial.begin(9600);
+    Serial.begin(9600);
 
-  WiFiSetup();
-  rtcSetEpoch();
-  printrtc();
-  pinMode(LED_BUILTIN, OUTPUT);
+    WiFiSetup();
+    rtcSetEpoch();
+    printrtc();
+    pinMode(LED_BUILTIN, OUTPUT);
 
-  my_sensor.init();
+    my_sensor.init();
 }
 
 void loop()
 {
-  /* Sense System State */
+    /* Sense System State */
 
-  my_sensor.getTempHum(temperature, humidity);
-  my_sensor.getSoilMoist(dryness_of_soil);
-  my_sensor.getWaterLevel(is_water_present);
-  my_sensor.getHowMuchLight(light_value);
+    my_sensor.getTempHum(temperature, humidity);
+    my_sensor.getSoilMoist(dryness_of_soil);
+    my_sensor.getWaterLevel(is_water_present);
+    my_sensor.getHowMuchLight(light_value);
 
-  Serial.print("temperature = ");
-  Serial.println(temperature, DEC);
-  Serial.print("humidity = ");
-  Serial.println(humidity, DEC);
-  Serial.print("soil moisture = ");
-  Serial.println(dryness_of_soil, DEC);
-  Serial.print("water present = ");
-  Serial.println(is_water_present, DEC);
-  Serial.print("light_value= ");
-  Serial.println(light_value, DEC);
-
-
-  /* Decide upon Actuation */
-
-  /* Pump Logic */
-  if (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3) && is_water_present && !pump_thread_active)
-  {
-    Serial.println("Soil is dry, water is present. Enabling pump.");
-
-    my_actuator.enablePump();
-    pump_thread_active = 1;
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    Serial.print("temperature = ");
+    Serial.println(temperature, DEC);
+    Serial.print("humidity = ");
+    Serial.println(humidity, DEC);
+    Serial.print("soil moisture = ");
+    Serial.println(dryness_of_soil, DEC);
+    Serial.print("water present = ");
+    Serial.println(is_water_present, DEC);
+    Serial.print("light_value= ");
+    Serial.println(light_value, DEC);
 
 
-    // Pump Thread logic, execute for some time || until there is no water || soil is moist enough
-    do
+    /* Decide upon Actuation */
+
+    /* Pump Logic */
+    if (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3) && is_water_present && !pump_thread_active)
     {
-      Serial.println("I am pumping.");
-      delay(1000);
-      my_sensor.getWaterLevel(is_water_present);
-      my_sensor.getSoilMoist(dryness_of_soil);
+        Serial.println("Soil is dry, water is present. Enabling pump.");
 
-    } while (is_water_present && (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)));
+        my_actuator.enablePump();
+        pump_thread_active = 1;
+        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
 
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-    my_actuator.disablePump();
-    delay(1000);
-  }
+/*
+        // Pump Thread logic, execute for some time || until there is no water || soil is moist enough
+        do
+        {
+            Serial.println("I am pumping.");
+            delay(1000);
+            my_sensor.getWaterLevel(is_water_present);
+            my_sensor.getSoilMoist(dryness_of_soil);
+
+        } while (is_water_present && (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)));
+*/
+        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+        my_actuator.disablePump();
+        delay(1000);
+    }
 
 
-  /* Light Logic */
-  if (light_value > MIN_LIGHT_THRESHOLD)
-  {
-    
-  }
+    /* Light Logic */
+    if (light_value > MIN_LIGHT_THRESHOLD)
+    {
+
+    }
 
 
-  delay(5000);
+    delay(5000);
 }
 
 
@@ -119,104 +123,114 @@ void loop()
 
 void rtcSetEpoch()
 {
-  unsigned long epoch;
-  int numberOfTries = 0, maxTries = 6;
-  do {
-    epoch = WiFi.getTime();
-    numberOfTries++;
-  }
-  while ((epoch == 0) && (numberOfTries < maxTries));
+    unsigned long epoch;
+    int numberOfTries = 0, maxTries = 6;
+    do {
+        epoch = WiFi.getTime();
+        numberOfTries++;
+    }
+    while ((epoch == 0) && (numberOfTries < maxTries));
 
-  if (numberOfTries == maxTries) {
-    Serial.print("NTP unreachable!!");
-    while (1);
-  }
-  else {
-    Serial.print("Epoch received: ");
-    Serial.println(epoch);
-    rtc.setEpoch(epoch);
+    if (numberOfTries == maxTries) {
+        Serial.print("NTP unreachable!!");
+        while (1);
+    }
+    else {
+        Serial.print("Epoch received: ");
+        Serial.println(epoch);
+        rtc.setEpoch(epoch);
 
-    Serial.println();
-  }
+        Serial.println();
+    }
 }
 
 
 void printrtc()
 {
-  // Print date...
-  Serial.print(rtc.getDay());
-  Serial.print("/");
-  Serial.print(rtc.getMonth());
-  Serial.print("/");
-  Serial.print(rtc.getYear());
-  Serial.print("\t");
+    // Print date...
+    Serial.print(rtc.getDay());
+    Serial.print("/");
+    Serial.print(rtc.getMonth());
+    Serial.print("/");
+    Serial.print(rtc.getYear());
+    Serial.print("\t");
 
-  // Print Time
-  Serial.print(rtc.getHours() + GMT);
-  Serial.print(":");
-  Serial.print(rtc.getMinutes());
-  Serial.print(":");
-  Serial.print(rtc.getSeconds());
+    // Print Time
+    Serial.print(rtc.getHours() + GMT);
+    Serial.print(":");
+    Serial.print(rtc.getMinutes());
+    Serial.print(":");
+    Serial.print(rtc.getSeconds());
 
-  Serial.println();
+    Serial.println();
+}
+/*-------------------------------------- Action --------------------------------------*/
+
+void pump()
+{
+    if (is_water_present && (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3))) {
+        Serial.println("I am pumping.");
+        my_sensor.getWaterLevel(is_water_present);
+        my_sensor.getSoilMoist(dryness_of_soil);
+    }
 }
 
 /*-------------------------------------- WEB COMM. --------------------------------------*/
 
 void WiFiSetup() {
-  WiFi.setPins(8, 7, 4, 2);
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present");
-    // don't continue:
-    while (true);
-  }
+    WiFi.setPins(8, 7, 4, 2);
+    if (WiFi.status() == WL_NO_SHIELD) {
+        Serial.println("WiFi shield not present");
+        // don't continue:
+        while (true);
+    }
 
-  // attempt to connect to WiFi network:
-  while ( status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-    status = WiFi.begin(ssid, pass);
+    // attempt to connect to WiFi network:
+    while ( status != WL_CONNECTED) {
+        Serial.print("Attempting to connect to SSID: ");
+        Serial.println(ssid);
+        // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
+        status = WiFi.begin(ssid, pass);
 
-    // wait 10 seconds for connection:
-    delay(10000);
-  }
-  // you're connected now, so print out the status:
-  printWiFiStatus();
+        // wait 10 seconds for connection:
+        delay(10000);
+    }
+    // you're connected now, so print out the status:
+    printWiFiStatus();
 }
 
 void printWiFiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-  // print the received signal strength:
-  long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
+    // print the SSID of the network you're attached to:
+    Serial.print("SSID: ");
+    Serial.println(WiFi.SSID());
+    // print your WiFi shield's IP address:
+    IPAddress ip = WiFi.localIP();
+    Serial.print("IP Address: ");
+    Serial.println(ip);
+    // print the received signal strength:
+    long rssi = WiFi.RSSI();
+    Serial.print("signal strength (RSSI):");
+    Serial.print(rssi);
+    Serial.println(" dBm");
 }
 
 /*
-  void httpSend() {
-  // close any connection before send a new request.
-  // This will free the socket on the WiFi shield
-  client.stop();
+    void httpSend() {
+    // close any connection before send a new request.
+    // This will free the socket on the WiFi shield
+    client.stop();
 
-  // if there's a successful connection:
-  int return_val = client.connect(server,80);
+    // if there's a successful connection:
+    int return_val = client.connect(server,80);
 
-  if (return_val) {
+    if (return_val) {
     Serial.println("connecting...");
     // send the HTTP PUT request:
     client.println("POST /postRoute HTTP/1.1");
     client.println("Host: projecthappy.herokuapp.com");
     client.println("User-Agent: ArduinoWiFi/1.1");
     client.println("Content-Type: application/x-www-form-urlencoded");
-  //    client.println("Content-Type: text-plain");
+    //    client.println("Content-Type: text-plain");
     client.println("Content-Length: 21");
     client.println("Connection: close");
     client.println();
@@ -227,23 +241,23 @@ void printWiFiStatus() {
 
     // note the time that the connection was made:
     lastConnectionTime = millis();
-  }
-  else {
+    }
+    else {
     // if you couldn't make a connection:
     Serial.println("connection to server failed. Failed with error:");
     Serial.println(return_val);
-  }
-  }
+    }
+    }
 
-  void httpReceive() {
-  // close any connection before send a new request.
-  // This will free the socket on the WiFi shield
-  client.stop();
+    void httpReceive() {
+    // close any connection before send a new request.
+    // This will free the socket on the WiFi shield
+    client.stop();
 
-  // if there's a successful connection:
-  int return_val = client.connect(server,80);
+    // if there's a successful connection:
+    int return_val = client.connect(server,80);
 
-  if (return_val) {
+    if (return_val) {
     Serial.println("connecting...");
     // send the HTTP PUT request:
     client.println("GET /test HTTP/1.1");
@@ -255,12 +269,12 @@ void printWiFiStatus() {
 
     // note the time that the connection was made:
     lastConnectionTime = millis();
-  }
-  else {
+    }
+    else {
     // if you couldn't make a connection:
     Serial.println("connection to server failed. Failed with error:");
     Serial.println(return_val);
-  }
-  }
+    }
+    }
 
 */
