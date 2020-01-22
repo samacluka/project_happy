@@ -16,6 +16,12 @@
 
 #define MIN_LIGHT_THRESHOLD 470
 
+#define ALLOWED_PUMPING_TIME 5000
+
+/*--------------------------------------- PROTOS ---------------------------------------*/
+
+void pump();
+
 /*--------------------------------------- GLOBALS ---------------------------------------*/
 
 char ssid[] = SECRET_SSID;
@@ -68,6 +74,8 @@ void loop()
     my_sensor.getWaterLevel(is_water_present);
     my_sensor.getHowMuchLight(light_value);
 
+    pumpAction.check();
+
     Serial.print("temperature = ");
     Serial.println(temperature, DEC);
     Serial.print("humidity = ");
@@ -83,29 +91,7 @@ void loop()
     /* Decide upon Actuation */
 
     /* Pump Logic */
-    if (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3) && is_water_present && !pump_thread_active)
-    {
-        Serial.println("Soil is dry, water is present. Enabling pump.");
 
-        my_actuator.enablePump();
-        pump_thread_active = 1;
-        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-
-/*
-        // Pump Thread logic, execute for some time || until there is no water || soil is moist enough
-        do
-        {
-            Serial.println("I am pumping.");
-            delay(1000);
-            my_sensor.getWaterLevel(is_water_present);
-            my_sensor.getSoilMoist(dryness_of_soil);
-
-        } while (is_water_present && (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)));
-*/
-        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-        my_actuator.disablePump();
-        delay(1000);
-    }
 
 
     /* Light Logic */
@@ -168,11 +154,37 @@ void printrtc()
 
 void pump()
 {
-    if (is_water_present && (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3))) {
-        Serial.println("I am pumping.");
+    static long int pump_start_time;
+    
+    
+    //if the plant needs water and we have the water to do it
+    if (dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3) && is_water_present && !pump_thread_active)
+    {
+        Serial.println("Soil is dry, water is present. Enabling pump.");
+
+        my_actuator.enablePump();
+        pump_thread_active = 1;
+        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+        
+        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    }
+    else if (pump_thread_active)
+    {
         my_sensor.getWaterLevel(is_water_present);
         my_sensor.getSoilMoist(dryness_of_soil);
+        if (!is_water_present || !(dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)))
+        {
+            my_actuator.disablePump();
+            pump_thread_active = 0;
+        }
+        else if ( (millis() - pump_start_time) >  ALLOWED_PUMPING_TIME)
+        {
+            my_actuator.disablePump();
+            pump_thread_active = 0;
+        }
+
     }
+
 }
 
 /*-------------------------------------- WEB COMM. --------------------------------------*/
