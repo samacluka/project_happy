@@ -2,7 +2,7 @@
 #define sensor_h
 
 
-#define TEMP_HUM_PIN 5
+#define TEMP_HUM_PIN 10
 #define SOIL_MOIST_PIN A4
 #define WATER_LEVEL_PIN 6 
 #define LIGHT_SENSE_PIN A1
