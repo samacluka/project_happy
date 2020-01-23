@@ -36,6 +36,7 @@ const int GMT = -5; //change this to adapt it to your time zone
 
 /* Create an rtc object */
 RTCZero rtc;
+unsigned int epoch;
 
 WiFiClient client;
 char server[] = "encouragemint.herokuapp.com";
@@ -51,6 +52,7 @@ int pump_thread_active = 0;
 int light_thread_active = 0;
 int minutes_of_light = 0;
 int total_minutes_of_light_today = 0;
+int light_readings_recorded = 0;
 
 long int pump_start_time;
 long int light_start_time;
@@ -68,7 +70,7 @@ char conlenString[30];
 
 TimedAction sensorAction = TimedAction(1 * 1000, sensorState);
 TimedAction pumpAction = TimedAction(500, pump);
-TimedAction lightAction = TimedAction(30 * 60 * 1000, light); // check light conditions every 30 minute.
+TimedAction lightAction = TimedAction(5 * 1000, light); // check light conditions every 30 seconds *************
 TimedAction httpPUTAction = TimedAction(30 * 1000, httpPUT);
 TimedAction httpGETAction = TimedAction(45 * 1000, httpGET);
 
@@ -77,6 +79,7 @@ TimedAction httpGETAction = TimedAction(45 * 1000, httpGET);
 void setup()
 {
   Serial.begin(9600);
+  rtc.begin();
 
   WiFiSetup();
   rtcSetEpoch();
@@ -92,13 +95,6 @@ void loop()
   lightAction.check();
   httpPUTAction.check();
   httpGETAction.check();
-
-
-  /* Light Logic */
-  if (light_value > MIN_LIGHT_THRESHOLD)
-  {
-
-  }
 }
 
 
@@ -106,7 +102,6 @@ void loop()
 
 void rtcSetEpoch()
 {
-  unsigned long epoch;
   int numberOfTries = 0, maxTries = 6;
   do {
     epoch = WiFi.getTime();
@@ -122,9 +117,13 @@ void rtcSetEpoch()
     Serial.print("Epoch received: ");
     Serial.println(epoch);
     rtc.setEpoch(epoch);
-
+    Serial.println("Epoch has been set");
+    Serial.println(rtc.getEpoch());
     Serial.println();
   }
+
+  Serial.print("The epoch from rtc is:");
+  Serial.println(rtc.getEpoch());
 
   // Print date...
   Serial.print(rtc.getDay());
@@ -182,6 +181,20 @@ void pump()
 
 void light()
 {
+  my_sensor.getHowMuchLight(light_value);
+  Serial.print("the light value is ");
+  Serial.print(light_value);
+  Serial.println();
+  
+  if (light_value > MIN_LIGHT_THRESHOLD)
+  {
+    minutes_of_light += 1;
+    Serial.println("The light value is above the minimum light threshold.");
+  }
+
+  light_readings_recorded += 1;
+
+
   if ((rtc.getHours() + GMT) < 7 || (rtc.getHours() + GMT) > 20) // check if it is too early or late to be turning on the lights
   {
     Serial.print("It is only");
@@ -195,6 +208,7 @@ void light()
       Serial.print("o'clock. I am turning the lights off.");
       my_actuator.disableLED();
       light_thread_active = 0;
+      light_readings_recorded = 0;
     }
 
     return;
@@ -202,17 +216,20 @@ void light()
 
 
   /* There needs to be some sort of logic in here tracking the total light that has been bee obtained in a day, turn the lights on for the remainder of the day etc. */
- 
-  if (minutes_of_light < 15 && (light_thread_active == 0))
+
+  if (minutes_of_light < 15 && (light_thread_active == 0) && light_readings_recorded == 10)
   {
+    Serial.println("We did not get enough light in the previous time range, I am turning the lights on.");
     my_actuator.enableLED();
     light_start_time = millis();
-    light_thread_active = 1;    
+    light_thread_active = 1;
+    light_readings_recorded = 0;
   }
   else if (light_thread_active)
   {
     if ( (millis() - light_start_time) >  ALLOWED_LED_TIME)
     {
+      Serial.println("I am turning the lights off, it has been enough time");
       my_actuator.disableLED();
       light_thread_active = 0;
     }
@@ -228,12 +245,6 @@ void sensorState()
   my_sensor.getSoilMoist(dryness_of_soil);
   my_sensor.getWaterLevel(is_water_present);
   my_sensor.getHowMuchLight(light_value);
-
-
-  if (light_value > MIN_LIGHT_THRESHOLD)
-  {
-    minutes_of_light += 1;
-  }
 
   //    Serial.print("temperature = ");
   //    Serial.println(temperature, DEC);
