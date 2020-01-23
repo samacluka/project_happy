@@ -15,7 +15,7 @@
 #define WET_SOIL_MOISTURE 395
 #define MIN_LIGHT_THRESHOLD 470
 #define ALLOWED_PUMPING_TIME 5000
-#define LED_PUMPING_TIME 20000
+#define ALLOWED_LED_TIME 20000
 
 /*--------------------------------------- PROTOS ---------------------------------------*/
 
@@ -48,9 +48,11 @@ int dryness_of_soil = 0;
 int is_water_present = 0;
 int light_value = 0;
 int pump_thread_active = 0;
+int light_thread_active = 0;
 int minutes_of_light = 0;
 
 long int pump_start_time;
+long int light_start_time;
 
 sensor my_sensor(0);
 actuator my_actuator(0);
@@ -77,7 +79,6 @@ void setup()
 
   WiFiSetup();
   rtcSetEpoch();
-  printrtc();
   pinMode(LED_BUILTIN, OUTPUT);
 
   my_sensor.init();
