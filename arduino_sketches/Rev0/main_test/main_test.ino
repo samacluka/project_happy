@@ -73,7 +73,7 @@ char conlenString[30];
 
 TimedAction sensorAction = TimedAction(1 * 1000, sensorState);
 TimedAction pumpAction = TimedAction(500, pump);
-TimedAction lightAction = TimedAction(5 * 1000, light); // check light conditions every 30 seconds *************
+TimedAction lightAction = TimedAction(1000, light); // check light conditions every 30 seconds *************
 TimedAction httpPUTAction = TimedAction(30 * 1000, httpPUT);
 TimedAction httpGETAction = TimedAction(45 * 1000, httpGET);
 
@@ -184,6 +184,8 @@ void pump()
 
 void light()
 {
+    Serial.println();
+    Serial.println();
     my_sensor.getHowMuchLight(light_value);
     Serial.print("the light value is ");
     Serial.print(light_value);
@@ -194,7 +196,11 @@ void light()
         minutes_of_light += 1;
         Serial.println("The light value is above the minimum light threshold.");
     }
+    else
+    {
+        Serial.println("The light value is below the minimum light threshold required.");
 
+    }
     light_readings_recorded += 1;
 
 
@@ -217,16 +223,22 @@ void light()
         return;
     }
 
-
     /* There needs to be some sort of logic in here tracking the total light that has been bee obtained in a day, turn the lights on for the remainder of the day etc. */
 
-    if (minutes_of_light < 15 && (light_thread_active == 0) && light_readings_recorded == 10)
+    if (minutes_of_light < 15 && (light_thread_active == 0) && light_readings_recorded == 20)
     {
         Serial.println("We did not get enough light in the previous time range, I am turning the lights on.");
         my_actuator.enableLED();
         light_start_time = millis();
         light_thread_active = 1;
         light_readings_recorded = 0;
+        minutes_of_light = 0;
+    }
+    else if (minutes_of_light > 15 && (light_thread_active == 0) && light_readings_recorded == 20)
+    {
+      Serial.println("We got enough light during the previous time frame. Resetting our count.");
+      light_readings_recorded = 0;
+      minutes_of_light = 0; 
     }
     else if (light_thread_active)
     {
@@ -238,7 +250,8 @@ void light()
         }
 
     }
-
+  Serial.println();
+  Serial.println();
 }
 
 
@@ -315,7 +328,7 @@ void httpPUT() {
             humidity = 0.;
         }
         
-        int ret = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, temperature, humString, humidity, moistString, dryness_of_soil, lightString, light_value, pumpString, 1);
+        int ret = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, temperature, humString, humidity, moistString, dryness_of_soil, lightString, light_value, pumpString, is_water_present);
         sprintf(conlenString, "Content-Length: %d", ret);
         
         Serial.print("PUT request sent: ");
