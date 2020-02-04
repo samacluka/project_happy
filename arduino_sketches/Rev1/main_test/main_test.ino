@@ -218,7 +218,7 @@ void light()
 
     /* There needs to be some sort of logic in here tracking the total light that has been bee obtained in a day, turn the lights on for the remainder of the day etc. */
 
-    if (minutes_of_light < 15 && (light_thread_active == 0) && light_readings_recorded == 20)
+    if (minutes_of_light < 15 && (light_thread_active == 0) && light_readings_recorded >= 20)
     {
         Serial.println("We did not get enough light in the previous time range, I am turning the lights on.");
         my_actuator.enableLED();
@@ -227,7 +227,7 @@ void light()
         light_readings_recorded = 0;
         minutes_of_light = 0;
     }
-    else if (minutes_of_light > 15 && (light_thread_active == 0) && light_readings_recorded == 20)
+    else if (minutes_of_light > 15 && (light_thread_active == 0) && light_readings_recorded >= 20)
     {
       Serial.println("We got enough light during the previous time frame. Resetting our count.");
       light_readings_recorded = 0;
