@@ -1,7 +1,4 @@
 #include <sensor.h>
-#include "DHT.h"
-
-#define DHTTYPE DHT22
 
 DHT dht(TEMP_HUM_PIN, DHTTYPE);
 
@@ -14,8 +11,6 @@ sensor::sensor(int num)
   pinMode(WATER_LEVEL_PIN, INPUT);
 
   pinMode(LIGHT_SENSE_PIN, INPUT);
-
-  // attachInterrupt(digitalPinToInterrupt(WATER_LEVEL_PIN), waterISR, LOW);
 }
 
 void sensor::init()
@@ -23,30 +18,52 @@ void sensor::init()
   dht.begin();
 }
 
-void sensor::getTempHum(float &temp, float &humidity)
+void sensor::poll()
 {
-  temp = dht.readTemperature();
+  temperature = dht.readTemperature();
 
   humidity = dht.readHumidity();
+
+  soil_moist = analogRead(SOIL_MOIST_PIN);  
+
+  water_present = digitalRead(WATER_LEVEL_PIN);
+
+  light = analogRead(LIGHT_SENSE_PIN);  
 }
 
-void sensor::getSoilMoist(int &soil_moist)
+float sensor::getTemperature()
 {
-  soil_moist = analogRead(SOIL_MOIST_PIN);
+  return temperature;
+}
+
+float sensor::getHumidity()
+{
+  return humidity;
+}
+
+int sensor::getSoilMoist()
+{
+  return soil_moist; 
 }	
 
-void sensor::getWaterLevel(int &water_present)
+int sensor::getWaterLevel()
 {
-  water_present = digitalRead(WATER_LEVEL_PIN);
+  return water_present;
 }
 
-void sensor::getHowMuchLight(int &light)
+int sensor::getLight()
 {
-  light = analogRead(LIGHT_SENSE_PIN);
+  return light;
 }
 
-// void sensor::waterISR()
-// {
-//   delay(10000);
-// 	Serial.print("HELLO I AM THE WATER ISR FEAR ME!");
-// }
+void sensor::setTemperatureZero()
+{
+  temperature = 0;
+  return;
+}
+
+void sensor::setHumidityZero()
+{
+  humidity = 0;
+  return;
+}

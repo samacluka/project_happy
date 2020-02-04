@@ -44,11 +44,6 @@ char server[] = "encouragemint.herokuapp.com";
 unsigned long lastConnectionTime = 0;
 const unsigned long postingInterval = 10L * 1000L;
 
-float temperature = 0;
-float humidity = 0;
-int dryness_of_soil = 0;
-int is_water_present = 0;
-int light_value = 0;
 int pump_thread_active = 0;
 int light_thread_active = 0;
 int minutes_of_light = 0;
@@ -71,7 +66,7 @@ char* plantID = "5e2071c27c213e47b9cb4142";
 char dataString[127];
 char conlenString[30];
 
-TimedAction sensorAction = TimedAction(1 * 1000, sensorState);
+TimedAction sensorAction = TimedAction(1 * 500, sensorState);
 TimedAction pumpAction = TimedAction(500, pump);
 TimedAction lightAction = TimedAction(1000, light); // check light conditions every 30 seconds *************
 TimedAction httpPUTAction = TimedAction(30 * 1000, httpPUT);
@@ -152,7 +147,7 @@ void rtcSetEpoch()
 void pump()
 {
     //if the plant needs water and we have the water to do it
-    if ((dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)) && is_water_present && (pump_thread_active == 0))
+    if ((my_sensor.getSoilMoist() > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)) && my_sensor.getWaterLevel() && (pump_thread_active == 0))
     {
 
         Serial.println("Soil is dry, water is present. Enabling pump.");
@@ -165,9 +160,8 @@ void pump()
     }
     else if (pump_thread_active)
     {
-        my_sensor.getWaterLevel(is_water_present);
-        my_sensor.getSoilMoist(dryness_of_soil);
-        if (!is_water_present || !(dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)))
+        my_sensor.poll();
+        if (!my_sensor.getWaterLevel() || !(my_sensor.getSoilMoist() > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)))
         {
             my_actuator.disablePump();
             pump_thread_active = 0;
@@ -186,12 +180,11 @@ void light()
 {
     Serial.println();
     Serial.println();
-    my_sensor.getHowMuchLight(light_value);
     Serial.print("the light value is ");
-    Serial.print(light_value);
+    Serial.print(my_sensor.getLight());
     Serial.println();
 
-    if (light_value > MIN_LIGHT_THRESHOLD)
+    if (my_sensor.getLight() > MIN_LIGHT_THRESHOLD)
     {
         minutes_of_light += 1;
         Serial.println("The light value is above the minimum light threshold.");
@@ -257,21 +250,18 @@ void light()
 
 void sensorState()
 {
-    my_sensor.getTempHum(temperature, humidity);
-    my_sensor.getSoilMoist(dryness_of_soil);
-    my_sensor.getWaterLevel(is_water_present);
-    my_sensor.getHowMuchLight(light_value);
+    my_sensor.poll();
 
         Serial.print("temperature = ");
-        Serial.println(temperature, DEC);
+        Serial.println(my_sensor.getTemperature(), DEC);
         Serial.print("humidity = ");
-        Serial.println(humidity, DEC);
+        Serial.println(my_sensor.getHumidity(), DEC);
         Serial.print("soil moisture = ");
-        Serial.println(dryness_of_soil, DEC);
+        Serial.println(my_sensor.getSoilMoist(), DEC);
         Serial.print("water present = ");
-        Serial.println(is_water_present, DEC);
+        Serial.println(my_sensor.getWaterLevel(), DEC);
         Serial.print("light_value= ");
-        Serial.println(light_value, DEC);
+        Serial.println(my_sensor.getLight(), DEC);
 }
 
 /*-------------------------------------- WEB COMM. --------------------------------------*/
@@ -323,12 +313,13 @@ void httpPUT() {
     int return_val = client.connect(server, 80);
 
     if (return_val) {
-        if(isnan(temperature) || isnan(humidity)) {
-            temperature = 0.;
-            humidity = 0.;
+        if(isnan(my_sensor.getTemperature()) || isnan(my_sensor.getHumidity())) {
+            my_sensor.setTemperatureZero();
+            my_sensor.setHumidityZero();
         }
         
-        int ret = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, temperature, humString, humidity, moistString, dryness_of_soil, lightString, light_value, pumpString, is_water_present);
+        int ret = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, my_sensor.getTemperature(), humString, my_sensor.getHumidity(), 
+                          moistString, my_sensor.getSoilMoist(), lightString, my_sensor.getLight(), pumpString, my_sensor.getWaterLevel());
         sprintf(conlenString, "Content-Length: %d", ret);
         
         Serial.print("PUT request sent: ");
