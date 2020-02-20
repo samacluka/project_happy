@@ -5,9 +5,16 @@
 
 #define DHTTYPE DHT22
 #define TEMP_HUM_PIN 10
-#define SOIL_MOIST_PIN A4
+#define SOIL_MOIST_PIN_1 A4
+#define SOIL_MOIST_PIN_2 A1     //WHICH PIN?
+#define SOIL_MOIST_PIN_3 A     //WHICH PIN?
 #define WATER_LEVEL_PIN 6 
-#define LIGHT_SENSE_PIN A1
+#define LIGHT_SENSE_PIN_1 A1
+#define LIGHT_SENSE_PIN_2 A     //WHICH PIN?
+#define LIGHT_SENSE_PIN_3 A     //WHICH PIN?
+#define MOIST_DIFF_TOL 100 // max difference allowed between sensor readings
+#define LIGHT_DIFF_TOL 100
+#define NUM_STORED_POINTS 30
 
 class sensor
 {
@@ -30,11 +37,17 @@ class sensor
 
   	float humidity;
 
-  	int soil_moist;  
+  	int soil_moist_avg;  
+
+    int soil_moist[NUM_STORED_POINTS] = {0};
 
   	int water_present;
 
- 	int light;  
+ 	  int light_avg;  
+
+    int light[NUM_STORED_POINTS] = {0};
+
+    int reading_num;
 };
 
 #endif

@@ -6,11 +6,19 @@ sensor::sensor(int num)
 {
   pinMode(TEMP_HUM_PIN, INPUT);
   
-  pinMode(SOIL_MOIST_PIN, INPUT);
+  pinMode(SOIL_MOIST_PIN_1, INPUT);
+
+  pinMode(SOIL_MOIST_PIN_2, INPUT);
+
+  pinMode(SOIL_MOIST_PIN_3, INPUT);
 
   pinMode(WATER_LEVEL_PIN, INPUT);
 
-  pinMode(LIGHT_SENSE_PIN, INPUT);
+  pinMode(LIGHT_SENSE_PIN_1, INPUT);
+
+  pinMode(LIGHT_SENSE_PIN_2, INPUT);
+
+  pinMode(LIGHT_SENSE_PIN_3, INPUT);
 }
 
 void sensor::init()
@@ -20,15 +28,79 @@ void sensor::init()
 
 void sensor::poll()
 {
+  if (reading_num == 30) {
+    reading_num = 0;
+  }
+
   temperature = dht.readTemperature();
 
   humidity = dht.readHumidity();
 
-  soil_moist = analogRead(SOIL_MOIST_PIN);  
+  // soil_moist = analogRead(SOIL_MOIST_PIN_1); 
+
+  int moist_1 = analogRead(SOIL_MOIST_PIN_1);
+  int moist_2 = analogRead(SOIL_MOIST_PIN_2);
+  int moist_3 = analogRead(SOIL_MOIST_PIN_3);
+
+  if (abs(moist_1-moist_2) > MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
+    soil_moist[reading_num] = 0;
+    Serial.println("Moisture readings too variable. Moisture reading unavailable."); //Should we send special value in this case?
+  }
+  else if (abs(moist_1-moist_2) < MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
+    soil_moist[reading_num] = (moist_1 + moist_2) / 2;
+  }
+  else if (abs(moist_1-moist_2) > MOIST_DIFF_TOL && abs(moist_1-moist_3) < MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
+    soil_moist[reading_num] = (moist_1 + moist_3) / 2;
+  }
+  else if (abs(moist_1-moist_2) > MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) < MOIST_DIFF_TOL) {
+    soil_moist[reading_num] = (moist_2 + moist_3) / 2;
+  }
+  else {
+    soil_moist[reading_num] = (moist_1 + moist_2 + moist_3)  / 3;
+  }
+
+  int tmp = 0;
+
+  for (int i = 0; i < NUM_STORED_POINTS; i++) {
+    tmp += soil_moist[i];
+  }
+
+  soil_moist_avg = tmp / NUM_STORED_POINTS;
 
   water_present = digitalRead(WATER_LEVEL_PIN);
 
-  light = analogRead(LIGHT_SENSE_PIN);  
+  // light = analogRead(LIGHT_SENSE_PIN);  
+
+  int light_1 = analogRead(LIGHT_SENSE_PIN_1);
+  int light_2 = analogRead(LIGHT_SENSE_PIN_2);
+  int light_3 = analogRead(LIGHT_SENSE_PIN_3);
+
+  if (abs(light_1-light_2) > LIGHT_DIFF_TOL && abs(light_1-light_3) > LIGHT_DIFF_TOL && abs(light_2-light_3) > LIGHT_DIFF_TOL) {
+    light[reading_num] = 0;
+    Serial.println("Light readings too variable. Light reading unavailable."); //Should we send special value in this case?
+  }
+  else if (abs(light_1-light_2) < LIGHT_DIFF_TOL && abs(light_1-light_3) > LIGHT_DIFF_TOL && abs(light_2-light_3) > LIGHT_DIFF_TOL) {
+    light[reading_num] = (light_1 + light_2) / 2;
+  }
+  else if (abs(light_1-light_2) > LIGHT_DIFF_TOL && abs(light_1-light_3) < LIGHT_DIFF_TOL && abs(light_2-light_3) > LIGHT_DIFF_TOL) {
+    light[reading_num] = (light_1 + light_3) / 2;
+  }
+  else if (abs(light_1-light_2) > LIGHT_DIFF_TOL && abs(light_1-light_3) > LIGHT_DIFF_TOL && abs(light_2-light_3) < LIGHT_DIFF_TOL) {
+    light[reading_num] = (light_2 + light_3) / 2;
+  }
+  else {
+    light[reading_num] = (light_1 + light_2 + light_3)  / 3;
+  }
+
+  tmp = 0;
+
+  for (i = 0; i < NUM_STORED_POINTS; i++) {
+    tmp += light[i];
+  }
+
+  light_avg = tmp / NUM_STORED_POINTS;
+
+  reading_num++;
 }
 
 float sensor::getTemperature()
@@ -43,7 +115,7 @@ float sensor::getHumidity()
 
 int sensor::getSoilMoist()
 {
-  return soil_moist; 
+  return soil_moist_avg; 
 }	
 
 int sensor::getWaterLevel()
@@ -53,7 +125,7 @@ int sensor::getWaterLevel()
 
 int sensor::getLight()
 {
-  return light;
+  return light_avg;
 }
 
 void sensor::setTemperatureZero()
