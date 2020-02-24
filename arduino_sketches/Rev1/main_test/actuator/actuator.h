@@ -7,7 +7,7 @@
 class actuator
 {
   public:
-    actuator(int value); 
+    actuator();
     void enablePump();
     void disablePump();
     void enableLED();

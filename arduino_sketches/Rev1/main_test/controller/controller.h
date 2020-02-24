@@ -1,31 +1,35 @@
 #ifndef controller_h
 #define controller_h
 
-#include <WiFi101.h>
 #include <RTCZero.h>
 
 #include "sensor.h"
+#include "actuator.h"
 #include "communication.h"
+
 
 class controller
 {
   public:
+    controller(){};
+
+    void init(char* ssid, char* pass);
+
     /* Set point functions */
     void set_setpoints();
 
     int get_light_hours_setpoint();
 
     int get_soil_moisture_setpoint();
-
     
     /* Data functions */
     int get_light_hours_data();
 
     int get_water_applied_data();
 
-    int get_temperature_data();
+    float get_temperature_data();
 
-    int get_humidity_data();
+    float get_humidity_data();
 
     int get_soil_moisture_data();
 
@@ -40,6 +44,14 @@ class controller
     void set_soil_moisture_data();
 
     void send_data_to_server();
+
+    void rtcSetEpoch();
+
+    sensor my_sensor;
+
+    actuator my_actuator;
+
+    communication my_communicator;
 
   private:
 	
@@ -59,9 +71,9 @@ class controller
 
     int soil_moisture_data;
 
-    WiFiClient client;
-
     RTCZero rtc;
+
+    unsigned int epoch;
 };
 
 #endif

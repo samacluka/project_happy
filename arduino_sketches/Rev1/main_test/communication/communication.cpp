@@ -25,7 +25,7 @@ void communication::setup(char* ssid, char* password)
 	printWiFiStatus();
 }
 
-void setServerID(char* serverID) {
+void communication::setServerID(char* serverID) {
 	server = serverID;
 }
 
@@ -42,7 +42,7 @@ void communication::printWiFiStatus()
 	Serial.println(" dBm");
 }
 
-void sendToServer(float temperature, float humidity, int moisture, int water, int light)
+void communication::sendToServer(float temperature, float humidity, int moisture, int water, int light)
 {
 	char* plantIDString = "plantid=";
 	char* tempString = "&temperature=";
@@ -58,15 +58,15 @@ void sendToServer(float temperature, float humidity, int moisture, int water, in
 	client.stop();
 
 	int return_val = client.connect(server, 80);
-
+	int content_length;
 	if (return_val) {
-		if(isnan(my_sensor.getTemperature()) || isnan(my_sensor.getHumidity())) {
-			int ret = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, 0., humString, 0., moistString, moisture, lightString, light, pumpString, water);
+		if(isnan(temperature) || isnan(humidity)) {
+			content_length = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, 0., humString, 0., moistString, moisture, lightString, light, pumpString, water);
 		}
 		else {
-			int ret = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, temperature, humString, humidity, moistString, moisture, lightString, light, pumpString, water);
+			content_length = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, temperature, humString, humidity, moistString, moisture, lightString, light, pumpString, water);
 		}
-		sprintf(conlenString, "Content-Length: %d", ret);
+		sprintf(conlenString, "Content-Length: %d", content_length);
 		sprintf(hostString, "Host: %s", server);
 
 		client.println("PUT /controller/setLogs HTTP/1.1");
@@ -93,7 +93,7 @@ void sendToServer(float temperature, float humidity, int moisture, int water, in
 	}
 }
 
-void getFromServer() {
+void communication::getFromServer() {
 	char hostString[50];
 
 	client.stop();
@@ -153,13 +153,11 @@ void getFromServer() {
         // Disconnect
         client.stop();
 
-        // note the time that the connection was made:
-        lastConnectionTime = millis();
     }
     else {
         // if you couldn't make a connection:
         Serial.println("connection to server failed. Failed with error:");
-        Serial.println(return_val);
+        Serial.println(ret_val);
     }
 }
 

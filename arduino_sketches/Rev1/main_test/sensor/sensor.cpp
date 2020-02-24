@@ -2,7 +2,7 @@
 
 DHT dht(TEMP_HUM_PIN, DHTTYPE);
 
-sensor::sensor(int num)
+sensor::sensor()
 {
   pinMode(TEMP_HUM_PIN, INPUT);
   
@@ -94,7 +94,7 @@ void sensor::poll()
 
   tmp = 0;
 
-  for (i = 0; i < NUM_STORED_POINTS; i++) {
+  for (int i = 0; i < NUM_STORED_POINTS; i++) {
     tmp += light[i];
   }
 

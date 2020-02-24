@@ -1,12 +1,12 @@
 #include <actuator.h>
 #include "DHT.h"
 
-actuator::actuator(int num)
+actuator::actuator()
 {
-  pinMode(PUMP_PIN, OUTPUT);
+	pinMode(PUMP_PIN, OUTPUT);
 
-  pinMode(LED_PIN, OUTPUT);  
-}
+	pinMode(LED_PIN, OUTPUT);  
+} 
 
 void actuator::enablePump()
 {

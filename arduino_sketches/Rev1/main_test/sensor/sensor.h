@@ -6,12 +6,12 @@
 #define DHTTYPE DHT22
 #define TEMP_HUM_PIN 10
 #define SOIL_MOIST_PIN_1 A4
-#define SOIL_MOIST_PIN_2 A1     //WHICH PIN?
-#define SOIL_MOIST_PIN_3 A     //WHICH PIN?
+#define SOIL_MOIST_PIN_2 A4     //WHICH PIN?
+#define SOIL_MOIST_PIN_3 A4     //WHICH PIN?
 #define WATER_LEVEL_PIN 6 
 #define LIGHT_SENSE_PIN_1 A1
-#define LIGHT_SENSE_PIN_2 A     //WHICH PIN?
-#define LIGHT_SENSE_PIN_3 A     //WHICH PIN?
+#define LIGHT_SENSE_PIN_2 A1     //WHICH PIN?
+#define LIGHT_SENSE_PIN_3 A1     //WHICH PIN?
 #define MOIST_DIFF_TOL 100 // max difference allowed between sensor readings
 #define LIGHT_DIFF_TOL 100
 #define NUM_STORED_POINTS 30
@@ -19,7 +19,7 @@
 class sensor
 {
   public:
-    sensor(int value); 
+    sensor();
     void init();
     void poll();
     float getTemperature(); // Function to read the temperature & humidity value from the temperature sensor
