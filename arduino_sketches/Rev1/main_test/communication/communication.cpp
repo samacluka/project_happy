@@ -4,10 +4,14 @@
 communication::communication() 
 {
 	status  = WL_IDLE_STATUS;
+	
 }
 
-void communication::setup(char* ssid, char* password)
+void communication::setup(char* ssid_in, char* password_in)
 {
+	ssid = ssid_in;
+	password = password_in;
+
 	WiFi.setPins(8,7,4,2);
 	if (WiFi.status() == WL_NO_SHIELD) {
 		Serial.println("WiFi shield not present");
@@ -55,6 +59,11 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 	char conlenString[30];
 	char hostString[50];
 
+	// Check that WiFi is still connected
+	if (status != WL_CONNECTED) {
+		setup(ssid, password);
+	}
+
 	client.stop();
 
 	int return_val = client.connect(server, 80);
@@ -95,6 +104,11 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 
 void communication::getFromServer() {
 	char hostString[50];
+
+	// Check that WiFi is still connected
+	if (status != WL_CONNECTED) {
+		setup(ssid, password);
+	}
 
 	client.stop();
 
@@ -142,13 +156,17 @@ void communication::getFromServer() {
 
 
         // Extract values
-        Serial.println(F("Response:"));
-        Serial.println(doc["Name"].as<char*>());
-        Serial.println(doc["Type"].as<char*>());
-        Serial.println(doc["soilMoisture"]["max"].as<float>(), 2);
-        Serial.println(doc["soilMoisture"]["min"].as<float>(), 2);
-        Serial.println(doc["lightThreshold"]["max"].as<float>(), 2);
-        Serial.println(doc["lightThreshold"]["min"].as<float>(), 2);
+        //Serial.println(F("Response:"));
+        //Serial.println(doc["Name"].as<char*>());
+        //Serial.println(doc["Type"].as<char*>());
+	moisture_setpoint_max = doc["soilMoisture"]["max"].as<int>();
+        //Serial.println(doc["soilMoisture"]["max"].as<int>(), 2);
+	moisture_setpoint_min = doc["soilMoisture"]["min"].as<int>();
+        //Serial.println(doc["soilMoisture"]["min"].as<int>(), 2);
+	light_setpoint_max = doc["lightThreshold"]["max"].as<int>();
+        //Serial.println(doc["lightThreshold"]["max"].as<int>(), 2);
+	light_setpoint_min = doc["lightThreshold"]["min"].as<int>();
+        //Serial.println(doc["lightThreshold"]["min"].as<int>(), 2);
 
         // Disconnect
         client.stop();
@@ -161,9 +179,25 @@ void communication::getFromServer() {
     }
 }
 
+int communication::getMoistureMax() 
+{
+	return moisture_setpoint_max;
+}
 
+int communication::getMoistureMin()
+{
+	return moisture_setpoint_min;
+}
 
+int communication::getLightMax()
+{
+	return light_setpoint_max;
+}
 
+int communication::getLightMin()
+{
+	return light_setpoint_min;
+}
 
 
 

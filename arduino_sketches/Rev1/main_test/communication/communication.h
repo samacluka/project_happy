@@ -11,6 +11,12 @@ private:
 	WiFiClient client;
 	char* server;
 	int status;
+	char* ssid;
+	char* password;
+	int moisture_setpoint_max;
+	int moisture_setpoint_min;
+	int light_setpoint_max;
+	int light_setpoint_min;
 
 public:
 	communication();
@@ -19,5 +25,9 @@ public:
 	void printWiFiStatus();
 	void sendToServer(float temperature, float humidity, int moisture, int water, int light);
 	void getFromServer();
+	int getMoistureMax();
+	int getMoistureMin();
+	int getLightMax();
+	int getLightMin();
 };
 #endif

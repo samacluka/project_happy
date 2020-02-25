@@ -7,6 +7,11 @@
 #include "actuator.h"
 #include "communication.h"
 
+#define DRY_SOIL_MOISTURE 798
+#define WET_SOIL_MOISTURE 395
+#define MIN_LIGHT_THRESHOLD 470
+#define ALLOWED_PUMPING_TIME 5000
+#define ALLOWED_LED_TIME 20000
 
 class controller
 {
@@ -47,6 +52,10 @@ class controller
 
     void rtcSetEpoch();
 
+    void checkPump();
+
+    void checkLights();
+
     sensor my_sensor;
 
     actuator my_actuator;
@@ -58,7 +67,9 @@ class controller
     /* Set Points that will be updated by get requests to server */
     int light_hours_setpoint;
 
-    int soil_moisture_setpoint;
+    int soil_moisture_setpoint_max;
+
+    int soil_moisture_setpoint_min;
 
     /* Control data used to determine actuation. Updated by sensors. Sent to server via put requests */
     int light_hours_data;
@@ -74,6 +85,22 @@ class controller
     RTCZero rtc;
 
     unsigned int epoch;
+
+    long int pump_start_time;
+    
+    long int light_start_time;
+
+    int pump_thread_active = 0;
+
+    int light_thread_active = 0;
+
+    int minutes_of_light = 0;
+
+    int total_minutes_of_light_today = 0;
+
+    int light_readings_recorded = 0;
+
+    const int GMT = -5;
 };
 
 #endif
