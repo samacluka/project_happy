@@ -13,6 +13,7 @@ private:
 	int status;
 	char* ssid;
 	char* password;
+	char* plantid;
 	int moisture_setpoint_max;
 	int moisture_setpoint_min;
 	int light_setpoint_max;
@@ -25,6 +26,7 @@ public:
 	void printWiFiStatus();
 	void sendToServer(float temperature, float humidity, int moisture, int water, int light);
 	void getFromServer();
+	void getPlantId();
 	int getMoistureMax();
 	int getMoistureMin();
 	int getLightMax();

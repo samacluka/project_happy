@@ -1,10 +1,10 @@
 #include <communication.h>
 
 
-communication::communication() 
+communication::communication()
 {
 	status  = WL_IDLE_STATUS;
-	
+
 }
 
 void communication::setup(char* ssid_in, char* password_in)
@@ -33,7 +33,7 @@ void communication::setServerID(char* serverID) {
 	server = serverID;
 }
 
-void communication::printWiFiStatus() 
+void communication::printWiFiStatus()
 {
 	Serial.println("SSID: ");
 	Serial.println(WiFi.SSID());
@@ -179,7 +179,71 @@ void communication::getFromServer() {
     }
 }
 
-int communication::getMoistureMax() 
+void communication::getPlantId() {
+	char hostString[50];
+
+	// Check that WiFi is still connected
+	if (status != WL_CONNECTED) {
+		setup(ssid, password);
+	}
+
+	client.stop();
+
+	sprintf(hostString, "Host: %s", server);
+
+	int ret_val =  client.connect(server, 80);
+
+	if (ret_val) {
+		client.println("GET /config/new HTTP/1.1");
+		client.println(hostString);
+		client.println("Connection: close");
+		client.println();
+
+        char status[32] = {0};
+        client.readBytesUntil('\r', status, sizeof(status));
+        // It should be "HTTP/1.0 200 OK" or "HTTP/1.1 200 OK"
+        if (strcmp(status + 9, "200 OK") != 0) {
+            Serial.print(F("Unexpected response: "));
+            Serial.println(status);
+            return;
+        }
+
+        // Skip HTTP headers
+        char endOfHeaders[] = "\r\n\r\n";
+        if (!client.find(endOfHeaders)) {
+            Serial.println(F("Invalid response"));
+            return;
+        }
+
+        // Allocate the JSON document
+        // Use arduinojson.org/v6/assistant to compute the capacity.
+        const size_t capacity = JSON_OBJECT_SIZE(1) + 128;
+        DynamicJsonDocument doc(capacity);
+
+        // Parse JSON object
+        DeserializationError error = deserializeJson(doc, client);
+        if (error) {
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.c_str());
+            return;
+        }
+
+
+        // Extract values
+				plantid = doc["id"].as<char*>();
+
+        // Disconnect
+        client.stop();
+
+    }
+    else {
+        // if you couldn't make a connection:
+        Serial.println("connection to server failed. Failed with error:");
+        Serial.println(ret_val);
+    }
+}
+
+int communication::getMoistureMax()
 {
 	return moisture_setpoint_max;
 }
@@ -198,9 +262,3 @@ int communication::getLightMin()
 {
 	return light_setpoint_min;
 }
-
-
-
-
-
-
