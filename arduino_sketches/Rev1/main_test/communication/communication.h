@@ -13,7 +13,7 @@ private:
 	int status;
 	char* ssid;
 	char* password;
-	char* plantid;
+	const char* plantid;
 	int moisture_setpoint_max;
 	int moisture_setpoint_min;
 	int light_setpoint_max;

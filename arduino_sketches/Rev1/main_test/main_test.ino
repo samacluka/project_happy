@@ -67,6 +67,15 @@ void sensorState()
 {
     my_controller.my_sensor.poll();
 
+    if (my_controller.my_sensor.getWaterLevel() == 0)
+    {
+        my_controller.waterIndicatorOn();
+    }
+    else
+    {
+        my_controller.waterIndicatorOff();
+    }
+    
         Serial.print("temperature = ");
         Serial.println(my_controller.my_sensor.getTemperature(), DEC);
         Serial.print("humidity = ");

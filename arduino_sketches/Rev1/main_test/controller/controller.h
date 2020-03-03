@@ -13,6 +13,8 @@
 #define ALLOWED_PUMPING_TIME 5000
 #define ALLOWED_LED_TIME 20000
 
+#define WATER_LED_PIN 5
+
 class controller
 {
   public:
@@ -55,6 +57,10 @@ class controller
     void checkPump();
 
     void checkLights();
+
+    void waterIndicatorOn();
+
+    void waterIndicatorOff();
 
     sensor my_sensor;
 

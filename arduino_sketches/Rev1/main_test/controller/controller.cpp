@@ -6,6 +6,8 @@ void controller::init(char* ssid, char* pass)
 
     my_communicator.setup(ssid, pass);
 
+    pinMode(WATER_LED_PIN, OUTPUT);
+
     rtc.begin();
 
     rtcSetEpoch();
@@ -166,3 +168,12 @@ void controller::set_setpoints()
 	soil_moisture_setpoint_min = my_communicator.getMoistureMin();
 }
 
+void controller::waterIndicatorOn()
+{
+	digitalWrite(WATER_LED_PIN, 1);
+}
+
+void controller::waterIndicatorOff()
+{
+	digitalWrite(WATER_LED_PIN, 0);
+}
