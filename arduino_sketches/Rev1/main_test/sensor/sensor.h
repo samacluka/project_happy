@@ -12,8 +12,8 @@
 #define LIGHT_SENSE_PIN_1 A1
 #define LIGHT_SENSE_PIN_2 A1     //WHICH PIN?
 #define LIGHT_SENSE_PIN_3 A1     //WHICH PIN?
-#define MOIST_DIFF_TOL 100 // max difference allowed between sensor readings
-#define LIGHT_DIFF_TOL 100
+#define MOIST_DIFF_TOL 30 // max difference allowed between sensor readings
+#define LIGHT_DIFF_TOL 90
 #define NUM_STORED_POINTS 30
 
 class sensor
