@@ -65,7 +65,9 @@ class controller
   private:
 	
     /* Set Points that will be updated by get requests to server */
-    int light_hours_setpoint;
+    int light_hours_min_setpoint;
+
+    int light_hours_max_setpoint;
 
     int soil_moisture_setpoint_max;
 

@@ -160,7 +160,8 @@ void controller::checkLights()
 
 void controller::set_setpoints()
 {
-	light_hours_setpoint = my_communicator.getLightMax();
+	light_hours_min_setpoint = my_communicator.getLightMax();
+	light_hours_max_setpoint = my_communicator.getLightMin();
 	soil_moisture_setpoint_max = my_communicator.getMoistureMax();
 	soil_moisture_setpoint_min = my_communicator.getMoistureMin();
 }

@@ -156,17 +156,10 @@ void communication::getFromServer() {
 
 
         // Extract values
-        //Serial.println(F("Response:"));
-        //Serial.println(doc["Name"].as<char*>());
-        //Serial.println(doc["Type"].as<char*>());
 	moisture_setpoint_max = doc["soilMoisture"]["max"].as<int>();
-        //Serial.println(doc["soilMoisture"]["max"].as<int>(), 2);
 	moisture_setpoint_min = doc["soilMoisture"]["min"].as<int>();
-        //Serial.println(doc["soilMoisture"]["min"].as<int>(), 2);
-	light_setpoint_max = doc["lightThreshold"]["max"].as<int>();
-        //Serial.println(doc["lightThreshold"]["max"].as<int>(), 2);
-	light_setpoint_min = doc["lightThreshold"]["min"].as<int>();
-        //Serial.println(doc["lightThreshold"]["min"].as<int>(), 2);
+	light_setpoint_max = doc["lightHours"]["max"].as<int>();
+	light_setpoint_min = doc["lightHours"]["min"].as<int>();
 
         // Disconnect
         client.stop();
@@ -230,7 +223,7 @@ void communication::getPlantId() {
 
 
         // Extract values
-				plantid = doc["id"].as<char*>();
+	plantid = doc["id"].as<char*>();
 
         // Disconnect
         client.stop();

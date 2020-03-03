@@ -85,4 +85,5 @@ void httpPUT() {
 
 void httpGET() {
   my_controller.my_communicator.getFromServer();
+  my_controller.set_setpoints();
 }
