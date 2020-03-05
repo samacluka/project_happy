@@ -68,6 +68,8 @@ class controller
 
     communication my_communicator;
 
+    RTCZero rtc;
+
   private:
 	
     /* Set Points that will be updated by get requests to server */
@@ -90,7 +92,7 @@ class controller
 
     int soil_moisture_data;
 
-    RTCZero rtc;
+    
 
     unsigned int epoch;
 
@@ -109,6 +111,10 @@ class controller
     int light_readings_recorded = 0;
 
     const int GMT = -5;
+
+    char* controller_network_ssid;
+
+    char* controller_network_password;
 };
 
 #endif

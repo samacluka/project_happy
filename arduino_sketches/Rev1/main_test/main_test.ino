@@ -34,9 +34,9 @@ TimedAction httpGETAction = TimedAction(45 * 1000, httpGET);
 /*----------------------------------------- MAIN -----------------------------------------*/
 
 void setup()
-{
-    my_controller.init(SECRET_SSID, SECRET_PASS);
+{   
     Serial.begin(9600);
+    my_controller.init(SECRET_SSID, SECRET_PASS);
     pinMode(LED_BUILTIN, OUTPUT);
 }
 
@@ -86,6 +86,8 @@ void sensorState()
         Serial.println(my_controller.my_sensor.getWaterLevel(), DEC);
         Serial.print("light_value= ");
         Serial.println(my_controller.my_sensor.getLight(), DEC);
+        Serial.print("Minutes:");
+        Serial.println(my_controller.rtc.getMinutes());
 }
 
 void httpPUT() {

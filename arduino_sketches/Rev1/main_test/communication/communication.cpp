@@ -22,7 +22,8 @@ void communication::setup(char* ssid_in, char* password_in)
 		Serial.print("Attempting to connect to SSID: ");
 		Serial.println(ssid);
 		status  = WiFi.begin(ssid, password);
-
+		Serial.print("Wifi status:");
+		Serial.println(status);
 		delay(1000);
 	}
 
@@ -60,7 +61,7 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 	char hostString[50];
 
 	// Check that WiFi is still connected
-	if (status != WL_CONNECTED) {
+	if (WiFi.status() != WL_CONNECTED) {
 		setup(ssid, password);
 	}
 
@@ -156,7 +157,7 @@ void communication::getFromServer() {
 	char hostString[50];
 
 	// Check that WiFi is still connected
-	if (status != WL_CONNECTED) {
+	if (WiFi.status() != WL_CONNECTED) {
 		setup(ssid, password);
 	}
 
@@ -226,7 +227,7 @@ void communication::getPlantId() {
 	char hostString[50];
 
 	// Check that WiFi is still connected
-	if (status != WL_CONNECTED) {
+	if (WiFi.status() != WL_CONNECTED) {
 		setup(ssid, password);
 	}
 

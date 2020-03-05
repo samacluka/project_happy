@@ -6,28 +6,48 @@ void controller::init(char* ssid, char* pass)
 
     my_communicator.setup(ssid, pass);
 
+	controller_network_ssid = ssid;
+
+	controller_network_password = pass;
+
     pinMode(WATER_LED_PIN, OUTPUT);
 
     rtc.begin();
 
     rtcSetEpoch();
+
+    Serial.println("Set epoch successfully");
 }
 
 void controller::rtcSetEpoch()
 {
+	if (WiFi.status() != WL_CONNECTED) {
+		Serial.println("Wifi was not connected when trying to set epoch");
+		my_communicator.setup(controller_network_ssid, controller_network_password);
+	}
+
+	Serial.println("Acquiring Epoch.");
 	const int GMT = -5; //change this to adapt it to your time zone
-    int numberOfTries = 0, maxTries = 6;
-    do {
+    int numberOfTries = 0, maxTries = 100;
+    do {	
         epoch = WiFi.getTime();
         numberOfTries++;
+        if (WiFi.status() != WL_CONNECTED) 
+        {
+        	Serial.println("Wifi was not connected when trying to set epoch (in the loop)");
+        	my_communicator.setup(controller_network_ssid, controller_network_password);
+        }
     }
     while ((epoch == 0) && (numberOfTries < maxTries));
 
-    if (numberOfTries == maxTries) {
-        Serial.print("NTP unreachable!!");
-        while (1);
+    if ((numberOfTries == maxTries) && (epoch == 0))
+    {
+        Serial.println("NTP unreachable!!");
+        rtcSetEpoch();
+        while(1);
     }
-    else {
+    else 
+    {
         Serial.print("Epoch received: ");
         Serial.println(epoch);
         rtc.setEpoch(epoch);
@@ -40,21 +60,19 @@ void controller::rtcSetEpoch()
     Serial.println(rtc.getEpoch());
 
     // Print date...
-    Serial.print(rtc.getDay());
-    Serial.print("/");
-    Serial.print(rtc.getMonth());
-    Serial.print("/");
-    Serial.print(rtc.getYear());
-    Serial.print("\t");
+    // Serial.print(rtc.getDay());
+    // Serial.print("/");
+    // Serial.print(rtc.getMonth());
+    // Serial.print("/");
+    // Serial.print(rtc.getYear());
+    // Serial.print("\t");
 
-    // Print Time
-    Serial.print(rtc.getHours() + GMT);
-    Serial.print(":");
-    Serial.print(rtc.getMinutes());
-    Serial.print(":");
-    Serial.print(rtc.getSeconds());
-
-    Serial.println();
+    // // Print Time
+    // Serial.print(rtc.getHours() + GMT);
+    // Serial.print(":");
+    // Serial.print(rtc.getMinutes());
+    // Serial.print(":");
+    // Serial.print(rtc.getSeconds());
 }
 
 void controller::checkPump() 
