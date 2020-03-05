@@ -25,33 +25,6 @@ class controller
     /* Set point functions */
     void set_setpoints();
 
-    int get_light_hours_setpoint();
-
-    int get_soil_moisture_setpoint();
-    
-    /* Data functions */
-    int get_light_hours_data();
-
-    int get_water_applied_data();
-
-    float get_temperature_data();
-
-    float get_humidity_data();
-
-    int get_soil_moisture_data();
-
-    void set_light_hours_data();
-
-    void set_water_applied_data();
-
-    void set_temperature_data();
-
-    void set_humidity_data();
-
-    void set_soil_moisture_data();
-
-    void send_data_to_server();
-
     void rtcSetEpoch();
 
     void checkPump();
