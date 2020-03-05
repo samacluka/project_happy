@@ -5,20 +5,6 @@
 #include <ArduinoJson.h>
 #include <math.h>
 
-#define WATERING_MESSAGE 0
-#define LIGHTS_ON_MESSAGE 1
-#define LIGHTS_OFF_MESSAGE 2
-#define WATER_EMPTY_MESSAGE 3
-
-#define PRIMARY 0
-#define SECONDARY 1
-#define SUCCESS 2
-#define DANGER 3
-#define WARNING 4
-#define INFO 5
-#define LIGHT 6
-#define DARK 7
-
 class communication
 {
 private:
@@ -32,8 +18,6 @@ private:
 	int moisture_setpoint_min;
 	int light_setpoint_max;
 	int light_setpoint_min;
-    const char* message[] = {"Plant is being watered.", "Plant lights have been turned on.", "Plant lights have been turned off.", "Water reservoir is empty."};
-    const char* message_type[] = {"primary","secondary","success","danger","warning","info","light","dark"};
 
 public:
 	communication();

@@ -82,7 +82,7 @@ void controller::checkPump()
     {   
         
         Serial.println("Soil is dry, water is present. Enabling pump.");
-        my_communicator.sendToServer(message[WATERING_MESSAGE], message_type[SUCCESS]);        
+        my_communicator.sendToServer("The plant is being watered.", "success");        
         my_actuator.enablePump();
         pump_thread_active = 1;
         pump_start_time = millis();
@@ -138,7 +138,7 @@ void controller::checkLights()
             my_actuator.disableLED();
             light_thread_active = 0;
             light_readings_recorded = 0;
-            my_communicator.sendToServer(message[LIGHTS_OFF], type[SUCCESS]);
+            my_communicator.sendToServer("Plant lights have been turned off.", "success");
         }
 
         return;
@@ -148,7 +148,7 @@ void controller::checkLights()
         my_actuator.enableLED();
         light_start_time = millis();
         light_thread_active = 1;
-        my_communicator.sendToServer(message[LIGHTS_ON_MESSAGE], type[SUCCESS]);
+        my_communicator.sendToServer("Plant lights have been turned on.", "success");
     }
 }
 

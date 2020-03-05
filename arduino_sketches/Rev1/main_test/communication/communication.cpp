@@ -123,7 +123,7 @@ void communication::sendToServer(char* message, char* type)
 	int return_val = client.connect(server, 80);
 	int content_length;
 	if (return_val) {
-		content_length = sprintf(dataString, "%s%s%s%s%s%s", plantIDString, plantID, messagString, message, typeString, type);
+		content_length = sprintf(dataString, "%s%s%s%s%s%s", plantIDString, plantID, messageString, message, typeString, type);
 
 		sprintf(conlenString, "Content-Length: %d", content_length);
 		sprintf(hostString, "Host: %s", server);
