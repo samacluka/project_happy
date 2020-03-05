@@ -102,6 +102,56 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 	}
 }
 
+void communication::sendToServer(char* message, char* type)
+{
+	char* plantIDString = "plantid=";
+    char* messageString = "&message=";
+    char* typeString = "&type=";
+	char* plantID = "5e2071c27c213e47b9cb4142";
+	char dataString[127];
+	char conlenString[30];
+	char hostString[50];
+
+	// Check that WiFi is still connected
+	if (WiFi.status() != WL_CONNECTED) {
+		setup(ssid, password);
+	}
+
+	client.stop();
+
+	int return_val = client.connect(server, 80);
+	int content_length;
+	if (return_val) {
+		content_length = sprintf(dataString, "%s%s%s%s%s%s", plantIDString, plantID, messagString, message, typeString, type);
+
+		sprintf(conlenString, "Content-Length: %d", content_length);
+		sprintf(hostString, "Host: %s", server);
+
+		client.println("PUT /controller/message HTTP/1.1");
+		client.println(hostString);
+		client.println("User-Agent: ArduinoWiFi/1.1");
+		client.println("Content-Type: application/x-www-form-urlencoded");
+		client.println(conlenString);
+		client.println("Connection: close");
+		client.println();
+		client.println(dataString);
+
+		char status[32] = {0};
+        client.readBytesUntil('\r', status, sizeof(status));
+        // It should be "HTTP/1.0 200 OK" or "HTTP/1.1 200 OK"
+        if (strcmp(status + 9, "200 OK") != 0) {
+            Serial.print(F("Unexpected response: "));
+            Serial.println(status);
+            return;
+        }
+	}
+	else {
+		Serial.println("connection to server failed. Failed with error:");
+        Serial.println(return_val);
+	}
+}
+
+
 void communication::getFromServer() {
 	char hostString[50];
 

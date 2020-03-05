@@ -75,9 +75,9 @@ class controller
 
     int light_hours_max_setpoint;
 
-    int soil_moisture_setpoint_max;
+    int soil_moisture_min_setpoint;
 
-    int soil_moisture_setpoint_min;
+    int soil_moisture_max_setpoint;
 
     /* Control data used to determine actuation. Updated by sensors. Sent to server via put requests */
     int light_hours_data;
