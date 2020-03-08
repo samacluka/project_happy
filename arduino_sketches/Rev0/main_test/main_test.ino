@@ -20,9 +20,9 @@
 
 /*--------------------------------------- PROTOS ---------------------------------------*/
 
-void sensorState();
-void pump();
-void light();
+//void sensorState();
+//void pump();
+//void light();
 void httpPUT();
 void httpGET();
 
@@ -58,8 +58,8 @@ int light_readings_recorded = 0;
 long int pump_start_time;
 long int light_start_time;
 
-sensor my_sensor(0);
-actuator my_actuator(0);
+sensor my_sensor();
+actuator my_actuator();
 
 char* plantIDString = "plantid=";
 char* tempString = "&temperature=";
@@ -67,13 +67,13 @@ char* humString = "&humidity=";
 char* moistString = "&soilMoisture=";
 char* lightString = "&light=";
 char* pumpString = "&pumpTime=";
-char* plantID = "5e2071c27c213e47b9cb4142";
+char* plantID = "5e45b99a7c213e47b9d84333";
 char dataString[127];
 char conlenString[30];
 
-TimedAction sensorAction = TimedAction(1 * 1000, sensorState);
-TimedAction pumpAction = TimedAction(500, pump);
-TimedAction lightAction = TimedAction(1000, light); // check light conditions every 30 seconds *************
+//TimedAction sensorAction = TimedAction(1 * 1000, sensorState);
+//TimedAction pumpAction = TimedAction(500, pump);
+//TimedAction lightAction = TimedAction(1000, light); // check light conditions every 30 seconds *************
 TimedAction httpPUTAction = TimedAction(30 * 1000, httpPUT);
 TimedAction httpGETAction = TimedAction(45 * 1000, httpGET);
 
@@ -88,14 +88,14 @@ void setup()
     rtcSetEpoch();
     pinMode(LED_BUILTIN, OUTPUT);
 
-    my_sensor.init();
+//    my_sensor.init();
 }
 
 void loop()
 {
-    sensorAction.check();
-    pumpAction.check();
-    lightAction.check();
+//    sensorAction.check();
+//    pumpAction.check();
+//    lightAction.check();
     httpPUTAction.check();
     httpGETAction.check();
 }
@@ -149,130 +149,130 @@ void rtcSetEpoch()
 
 /*-------------------------------------- Action --------------------------------------*/
 
-void pump()
-{
-    //if the plant needs water and we have the water to do it
-    if ((dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)) && is_water_present && (pump_thread_active == 0))
-    {
-
-        Serial.println("Soil is dry, water is present. Enabling pump.");
-
-        my_actuator.enablePump();
-        pump_thread_active = 1;
-        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-        pump_start_time = millis();
-        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-    }
-    else if (pump_thread_active)
-    {
-        my_sensor.getWaterLevel(is_water_present);
-        my_sensor.getSoilMoist(dryness_of_soil);
-        if (!is_water_present || !(dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)))
-        {
-            my_actuator.disablePump();
-            pump_thread_active = 0;
-        }
-        else if ( (millis() - pump_start_time) >  ALLOWED_PUMPING_TIME)
-        {
-            my_actuator.disablePump();
-            pump_thread_active = 0;
-        }
-
-    }
-
-}
-
-void light()
-{
-    Serial.println();
-    Serial.println();
-    my_sensor.getHowMuchLight(light_value);
-    Serial.print("the light value is ");
-    Serial.print(light_value);
-    Serial.println();
-
-    if (light_value > MIN_LIGHT_THRESHOLD)
-    {
-        minutes_of_light += 1;
-        Serial.println("The light value is above the minimum light threshold.");
-    }
-    else
-    {
-        Serial.println("The light value is below the minimum light threshold required.");
-
-    }
-    light_readings_recorded += 1;
-
-
-    if ((rtc.getHours() + GMT) < 7 || (rtc.getHours() + GMT) > 20) // check if it is too early or late to be turning on the lights
-    {
-        Serial.print("It is only");
-        Serial.print(rtc.getHours() + GMT);
-        Serial.print("o'clock. I cannot turn the lights on.");
-
-        if (light_thread_active)
-        {
-            Serial.print("It is too late for lights. It is");
-            Serial.print(rtc.getHours() + GMT);
-            Serial.print("o'clock. I am turning the lights off.");
-            my_actuator.disableLED();
-            light_thread_active = 0;
-            light_readings_recorded = 0;
-        }
-
-        return;
-    }
-
-    /* There needs to be some sort of logic in here tracking the total light that has been bee obtained in a day, turn the lights on for the remainder of the day etc. */
-
-    if (minutes_of_light < 15 && (light_thread_active == 0) && light_readings_recorded == 20)
-    {
-        Serial.println("We did not get enough light in the previous time range, I am turning the lights on.");
-        my_actuator.enableLED();
-        light_start_time = millis();
-        light_thread_active = 1;
-        light_readings_recorded = 0;
-        minutes_of_light = 0;
-    }
-    else if (minutes_of_light > 15 && (light_thread_active == 0) && light_readings_recorded == 20)
-    {
-      Serial.println("We got enough light during the previous time frame. Resetting our count.");
-      light_readings_recorded = 0;
-      minutes_of_light = 0; 
-    }
-    else if (light_thread_active)
-    {
-        if ( (millis() - light_start_time) >  ALLOWED_LED_TIME)
-        {
-            Serial.println("I am turning the lights off, it has been enough time");
-            my_actuator.disableLED();
-            light_thread_active = 0;
-        }
-
-    }
-  Serial.println();
-  Serial.println();
-}
-
-
-void sensorState()
-{
-    my_sensor.getTempHum(temperature, humidity);
-    my_sensor.getSoilMoist(dryness_of_soil);
-    my_sensor.getWaterLevel(is_water_present);
-    my_sensor.getHowMuchLight(light_value);
-
-        Serial.print("temperature = ");
-        Serial.println(temperature, DEC);
-        Serial.print("humidity = ");
-        Serial.println(humidity, DEC);
-        Serial.print("soil moisture = ");
-        Serial.println(dryness_of_soil, DEC);
-        Serial.print("water present = ");
-        Serial.println(is_water_present, DEC);
-        Serial.print("light_value= ");
-        Serial.println(light_value, DEC);
-}
+//void pump()
+//{
+//    //if the plant needs water and we have the water to do it
+//    if ((dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)) && is_water_present && (pump_thread_active == 0))
+//    {
+//
+//        Serial.println("Soil is dry, water is present. Enabling pump.");
+//
+//        my_actuator.enablePump();
+//        pump_thread_active = 1;
+//        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//        pump_start_time = millis();
+//        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//    }
+//    else if (pump_thread_active)
+//    {
+//        my_sensor.getWaterLevel(is_water_present);
+//        my_sensor.getSoilMoist(dryness_of_soil);
+//        if (!is_water_present || !(dryness_of_soil > DRY_SOIL_MOISTURE - ((DRY_SOIL_MOISTURE - WET_SOIL_MOISTURE) / 3)))
+//        {
+//            my_actuator.disablePump();
+//            pump_thread_active = 0;
+//        }
+//        else if ( (millis() - pump_start_time) >  ALLOWED_PUMPING_TIME)
+//        {
+//            my_actuator.disablePump();
+//            pump_thread_active = 0;
+//        }
+//
+//    }
+//
+//}
+//
+//void light()
+//{
+//    Serial.println();
+//    Serial.println();
+//    my_sensor.getHowMuchLight(light_value);
+//    Serial.print("the light value is ");
+//    Serial.print(light_value);
+//    Serial.println();
+//
+//    if (light_value > MIN_LIGHT_THRESHOLD)
+//    {
+//        minutes_of_light += 1;
+//        Serial.println("The light value is above the minimum light threshold.");
+//    }
+//    else
+//    {
+//        Serial.println("The light value is below the minimum light threshold required.");
+//
+//    }
+//    light_readings_recorded += 1;
+//
+//
+//    if ((rtc.getHours() + GMT) < 7 || (rtc.getHours() + GMT) > 20) // check if it is too early or late to be turning on the lights
+//    {
+//        Serial.print("It is only");
+//        Serial.print(rtc.getHours() + GMT);
+//        Serial.print("o'clock. I cannot turn the lights on.");
+//
+//        if (light_thread_active)
+//        {
+//            Serial.print("It is too late for lights. It is");
+//            Serial.print(rtc.getHours() + GMT);
+//            Serial.print("o'clock. I am turning the lights off.");
+//            my_actuator.disableLED();
+//            light_thread_active = 0;
+//            light_readings_recorded = 0;
+//        }
+//
+//        return;
+//    }
+//
+//    /* There needs to be some sort of logic in here tracking the total light that has been bee obtained in a day, turn the lights on for the remainder of the day etc. */
+//
+//    if (minutes_of_light < 15 && (light_thread_active == 0) && light_readings_recorded == 20)
+//    {
+//        Serial.println("We did not get enough light in the previous time range, I am turning the lights on.");
+//        my_actuator.enableLED();
+//        light_start_time = millis();
+//        light_thread_active = 1;
+//        light_readings_recorded = 0;
+//        minutes_of_light = 0;
+//    }
+//    else if (minutes_of_light > 15 && (light_thread_active == 0) && light_readings_recorded == 20)
+//    {
+//      Serial.println("We got enough light during the previous time frame. Resetting our count.");
+//      light_readings_recorded = 0;
+//      minutes_of_light = 0; 
+//    }
+//    else if (light_thread_active)
+//    {
+//        if ( (millis() - light_start_time) >  ALLOWED_LED_TIME)
+//        {
+//            Serial.println("I am turning the lights off, it has been enough time");
+//            my_actuator.disableLED();
+//            light_thread_active = 0;
+//        }
+//
+//    }
+//  Serial.println();
+//  Serial.println();
+//}
+//
+//
+//void sensorState()
+//{
+//    my_sensor.getTempHum(temperature, humidity);
+//    my_sensor.getSoilMoist(dryness_of_soil);
+//    my_sensor.getWaterLevel(is_water_present);
+//    my_sensor.getHowMuchLight(light_value);
+//
+//        Serial.print("temperature = ");
+//        Serial.println(temperature, DEC);
+//        Serial.print("humidity = ");
+//        Serial.println(humidity, DEC);
+//        Serial.print("soil moisture = ");
+//        Serial.println(dryness_of_soil, DEC);
+//        Serial.print("water present = ");
+//        Serial.println(is_water_present, DEC);
+//        Serial.print("light_value= ");
+//        Serial.println(light_value, DEC);
+//}
 
 /*-------------------------------------- WEB COMM. --------------------------------------*/
 
@@ -383,7 +383,7 @@ void httpGET() {
         client.println("Content-Length: 32");
         client.println("Connection: close");
         client.println();
-        client.println("plantid=5e2071c27c213e47b9cb4142");
+        client.println("plantid=5e45b99a7c213e47b9d84333");
 
         // Check HTTP status
         char status[32] = {0};

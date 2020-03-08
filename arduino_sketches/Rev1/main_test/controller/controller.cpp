@@ -4,6 +4,8 @@ void controller::init(char* ssid, char* pass)
 {
 	my_sensor.init();
 
+    my_communicator.setServerID("encouragemint.herokuapp.com");
+
     my_communicator.setup(ssid, pass);
 
 	controller_network_ssid = ssid;
@@ -17,6 +19,8 @@ void controller::init(char* ssid, char* pass)
     rtcSetEpoch();
 
     Serial.println("Set epoch successfully");
+
+    my_communicator.sendToServer("System initialized succesfully.", "success");  
 }
 
 void controller::rtcSetEpoch()
@@ -110,11 +114,11 @@ void controller::checkLights()
     if (my_sensor.getLight() > MIN_LIGHT_THRESHOLD)
     {
         minutes_of_light += 1;
-        Serial.println("The light value is above the minimum light threshold.");
+        // Serial.println("The light value is above the minimum light threshold.");
     }
     else
     {
-        Serial.println("The light value is below the minimum light threshold required.");
+        // Serial.println("The light value is below the minimum light threshold required.");
 
     }
 
@@ -168,4 +172,9 @@ void controller::waterIndicatorOn()
 void controller::waterIndicatorOff()
 {
 	digitalWrite(WATER_LED_PIN, 0);
+}
+
+int controller::get_light_hours_data()
+{
+    return light_hours_data;
 }

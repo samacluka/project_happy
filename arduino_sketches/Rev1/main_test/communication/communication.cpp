@@ -18,6 +18,11 @@ void communication::setup(char* ssid_in, char* password_in)
 		while(true);
 	}
 
+    Serial.print("WiFi status in setup: ");
+    Serial.println(WiFi.status());
+    Serial.print("server in setup: ");
+    Serial.println(server);
+
 	while (status != WL_CONNECTED) {
 		Serial.print("Attempting to connect to SSID: ");
 		Serial.println(ssid);
@@ -55,7 +60,7 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 	char* moistString = "&soilMoisture=";
 	char* lightString = "&light=";
 	char* pumpString = "&pumpTime=";
-	char* plantID = "5e2071c27c213e47b9cb4142";
+//	char* plantID = "5e2071c27c213e47b9cb4142";
 	char dataString[127];
 	char conlenString[30];
 	char hostString[50];
@@ -78,8 +83,8 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 		}
 		sprintf(conlenString, "Content-Length: %d", content_length);
 		sprintf(hostString, "Host: %s", server);
-
-		client.println("PUT /controller/setLogs HTTP/1.1");
+		
+        client.println("PUT /controller/setLogs HTTP/1.1");
 		client.println(hostString);
 		client.println("User-Agent: ArduinoWiFi/1.1");
 		client.println("Content-Type: application/x-www-form-urlencoded");
@@ -108,7 +113,7 @@ void communication::sendToServer(char* message, char* type)
 	char* plantIDString = "plantid=";
     char* messageString = "&message=";
     char* typeString = "&type=";
-	char* plantID = "5e2071c27c213e47b9cb4142";
+//	char* plantID = "5e2071c27c213e47b9cb4142";
 	char dataString[127];
 	char conlenString[30];
 	char hostString[50];
@@ -128,7 +133,7 @@ void communication::sendToServer(char* message, char* type)
 		sprintf(conlenString, "Content-Length: %d", content_length);
 		sprintf(hostString, "Host: %s", server);
 
-		client.println("PUT /controller/message HTTP/1.1");
+		client.println("POST /controller/message HTTP/1.1");
 		client.println(hostString);
 		client.println("User-Agent: ArduinoWiFi/1.1");
 		client.println("Content-Type: application/x-www-form-urlencoded");
@@ -155,6 +160,9 @@ void communication::sendToServer(char* message, char* type)
 
 void communication::getFromServer() {
 	char hostString[50];
+    char plantIDString[100];
+    char conlenString[30];
+    int contentLength;
 
 	// Check that WiFi is still connected
 	if (WiFi.status() != WL_CONNECTED) {
@@ -164,17 +172,19 @@ void communication::getFromServer() {
 	client.stop();
 
 	sprintf(hostString, "Host: %s", server);
-
-	int ret_val =  client.connect(server, 80);
+    contentLength=sprintf(plantIDString, "plantid=%s", plantID);
+    sprintf(conlenString, "Content-Length: %d", contentLength);
+	
+    int ret_val =  client.connect(server, 80);
 
 	if (ret_val) {
 		client.println("GET /controller/getSetpoints HTTP/1.1");
 		client.println(hostString);
 		client.println("Content-Type: application/x-www-form-urlencoded");
-		client.println("Content-Length: 32");
+		client.println(conlenString);
 		client.println("Connection: close");
 		client.println();
-        client.println("plantid=5e2071c27c213e47b9cb4142");
+        client.println(plantIDString);
 
         char status[32] = {0};
         client.readBytesUntil('\r', status, sizeof(status));

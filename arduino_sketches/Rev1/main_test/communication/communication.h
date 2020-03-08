@@ -13,6 +13,7 @@ private:
 	int status;
 	char* ssid;
 	char* password;
+    char* plantID = "5e45b99a7c213e47b9d84333";
 	const char* plantid;
 	int moisture_setpoint_max;
 	int moisture_setpoint_min;
