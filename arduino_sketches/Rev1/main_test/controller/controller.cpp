@@ -31,10 +31,10 @@ void controller::rtcSetEpoch()
 	}
 
 	Serial.println("Acquiring Epoch.");
-	const int GMT = -5; //change this to adapt it to your time zone
+	// const int GMT = -5; //change this to adapt it to your time zone
     int numberOfTries = 0, maxTries = 100;
     do {	
-        epoch = WiFi.getTime();
+        epoch = WiFi.getTime() + GMT * 3600;
         numberOfTries++;
         if (WiFi.status() != WL_CONNECTED) 
         {
@@ -72,11 +72,11 @@ void controller::rtcSetEpoch()
     // Serial.print("\t");
 
     // // Print Time
-    // Serial.print(rtc.getHours() + GMT);
-    // Serial.print(":");
-    // Serial.print(rtc.getMinutes());
-    // Serial.print(":");
-    // Serial.print(rtc.getSeconds());
+    Serial.print(rtc.getHours());
+    Serial.print(":");
+    Serial.print(rtc.getMinutes());
+    Serial.print(":");
+    Serial.print(rtc.getSeconds());
 }
 
 void controller::checkPump() 
@@ -132,13 +132,13 @@ void controller::checkLights()
     {
         Serial.print("It is only");
         Serial.print(rtc.getHours() + GMT);
-        Serial.print("o'clock. I cannot turn the lights on.");
+        Serial.println("o'clock. I cannot turn the lights on.");
 
         if (light_thread_active)
         {
             Serial.print("It is too late for lights. It is");
             Serial.print(rtc.getHours() + GMT);
-            Serial.print("o'clock. I am turning the lights off.");
+            Serial.println("o'clock. I am turning the lights off.");
             my_actuator.disableLED();
             light_thread_active = 0;
             light_readings_recorded = 0;

@@ -35,6 +35,8 @@ class controller
 
     void waterIndicatorOff();
 
+    int get_light_hours_data();
+
     sensor my_sensor;
 
     actuator my_actuator;
@@ -65,8 +67,6 @@ class controller
 
     int soil_moisture_data;
 
-    
-
     unsigned int epoch;
 
     long int pump_start_time;
@@ -83,7 +83,7 @@ class controller
 
     int light_readings_recorded = 0;
 
-    const int GMT = -5;
+    const int GMT = -4;
 
     char* controller_network_ssid;
 
