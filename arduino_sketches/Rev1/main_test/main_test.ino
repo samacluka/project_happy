@@ -20,8 +20,8 @@ void httpGET();
 
 /*--------------------------------------- GLOBALS ---------------------------------------*/
 
-char* ssid = SECRET_SSID;
-char* pass = SECRET_PASS;
+//char* ssid = SECRET_SSID;
+//char* pass = SECRET_PASS;
 
 controller my_controller;
 

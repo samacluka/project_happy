@@ -217,12 +217,10 @@ void communication::getFromServer() {
 
 
         // Extract values
-	moisture_setpoint_max = doc["soilMoisture"]["max"].as<int>();
-	moisture_setpoint_min = doc["soilMoisture"]["min"].as<int>();
-	light_setpoint_max = doc["lightThreshold"]["max"].as<int>();
-	light_setpoint_min = doc["lightThreshold"]["min"].as<int>();
-	Serial.print("In communication GET, light hours min: ");
-    Serial.println(light_setpoint_min);
+		moisture_setpoint_max = doc["soilMoisture"]["max"].as<int>();
+		moisture_setpoint_min = doc["soilMoisture"]["min"].as<int>();
+		light_setpoint_max = doc["lightThreshold"]["max"].as<int>();
+		light_setpoint_min = doc["lightThreshold"]["min"].as<int>();
 
         // Disconnect
         client.stop();

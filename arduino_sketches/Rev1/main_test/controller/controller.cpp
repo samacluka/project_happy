@@ -8,9 +8,9 @@ void controller::init(char* ssid, char* pass)
 
     my_communicator.setup(ssid, pass);
 
-	controller_network_ssid = ssid;
+	// controller_network_ssid = ssid;
 
-	controller_network_password = pass;
+	// controller_network_password = pass;
 
     pinMode(WATER_LED_PIN, OUTPUT);
 

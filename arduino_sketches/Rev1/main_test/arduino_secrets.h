@@ -1,2 +1,2 @@
-#define SECRET_SSID "iPhone"
-#define SECRET_PASS "AbbyRocks"
+char* SECRET_SSID = "iPhone";
+char* SECRET_PASS = "AbbyRocks";
