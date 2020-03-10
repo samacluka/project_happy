@@ -33,5 +33,6 @@ public:
 	int getMoistureMin();
 	int getLightMax();
 	int getLightMin();
+	int getTime();
 };
 #endif

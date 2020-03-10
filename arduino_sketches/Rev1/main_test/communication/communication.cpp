@@ -297,6 +297,73 @@ void communication::getPlantId() {
     }
 }
 
+int communication::getTime()
+{
+	char hostString[50];
+
+	// Check that WiFi is still connected
+	if (WiFi.status() != WL_CONNECTED) {
+		setup(ssid, password);
+	}
+
+	client.stop();
+
+	sprintf(hostString, "Host: %s", server);
+	
+    int ret_val =  client.connect(server, 80);
+
+	if (ret_val) {
+		client.println("GET /controller/epoch HTTP/1.1");
+		client.println(hostString);
+		client.println("Content-Type: application/x-www-form-urlencoded");
+		client.println("Content-Length: 0");
+		client.println("Connection: close");
+		client.println();
+
+        char status[32] = {0};
+        client.readBytesUntil('\r', status, sizeof(status));
+        // It should be "HTTP/1.0 200 OK" or "HTTP/1.1 200 OK"
+        if (strcmp(status + 9, "200 OK") != 0) {
+            Serial.print(F("Unexpected response: "));
+            Serial.println(status);
+            return 0;
+        }
+
+        // Skip HTTP headers
+        char endOfHeaders[] = "\r\n\r\n";
+        if (!client.find(endOfHeaders)) {
+            Serial.println(F("Invalid response"));
+            return 0;
+        }
+
+        // Allocate the JSON document
+        // Use arduinojson.org/v6/assistant to compute the capacity.
+        const size_t capacity = JSON_OBJECT_SIZE(1) + 64;
+        DynamicJsonDocument doc(capacity);
+
+        // Parse JSON object
+        DeserializationError error = deserializeJson(doc, client);
+        if (error) {
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.c_str());
+            return 0;
+        }		
+
+        // Disconnect
+        client.stop();
+
+        return(doc["epoch"].as<unsigned long int>());
+
+    }
+    else {
+        // if you couldn't make a connection:
+        Serial.println("connection to server failed. Failed with error:");
+        Serial.println(ret_val);
+
+        return 0;
+    }
+}
+
 int communication::getMoistureMax()
 {
 	return moisture_setpoint_max;

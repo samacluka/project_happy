@@ -34,7 +34,8 @@ void controller::rtcSetEpoch()
 	// const int GMT = -5; //change this to adapt it to your time zone
     int numberOfTries = 0, maxTries = 100;
     do {	
-        epoch = WiFi.getTime() + GMT * 3600;
+        // epoch = WiFi.getTime() + GMT * 3600;
+        epoch = my_communicator.getTime() + GMT * 3600;
         numberOfTries++;
         if (WiFi.status() != WL_CONNECTED) 
         {
@@ -122,22 +123,22 @@ void controller::checkLights()
 
     }
 
-    if ((rtc.getHours() + GMT) == 0) {
+    if (rtc.getHours() == 0) {
         minutes_of_light = 0;
     } 
 
     light_hours_data = minutes_of_light/60;
 
-    if ((rtc.getHours() + GMT) < 7 || (rtc.getHours() + GMT) > 20) // check if it is too early or late to be turning on the lights
+    if (rtc.getHours() < earliest_on_hour || rtc.getHours() > latest_on_hour) // check if it is too early or late to be turning on the lights
     {
         Serial.print("It is only");
-        Serial.print(rtc.getHours() + GMT);
+        Serial.print(rtc.getHours());
         Serial.println("o'clock. I cannot turn the lights on.");
 
         if (light_thread_active)
         {
             Serial.print("It is too late for lights. It is");
-            Serial.print(rtc.getHours() + GMT);
+            Serial.print(rtc.getHours());
             Serial.println("o'clock. I am turning the lights off.");
             my_actuator.disableLED();
             light_thread_active = 0;
@@ -148,7 +149,7 @@ void controller::checkLights()
         return;
     }
 
-    if (((20 - (rtc.getHours() + GMT)) * 60 - rtc.getMinutes()) < (light_hours_min_setpoint - minutes_of_light) && !light_thread_active) {
+    if (((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) < (light_hours_min_setpoint - minutes_of_light) && !light_thread_active) {
         my_actuator.enableLED();
         light_start_time = millis();
         light_thread_active = 1;

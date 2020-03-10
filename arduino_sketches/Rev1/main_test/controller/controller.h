@@ -67,7 +67,7 @@ class controller
 
     int soil_moisture_data;
 
-    unsigned int epoch;
+    unsigned long int epoch;
 
     long int pump_start_time;
     
@@ -84,6 +84,10 @@ class controller
     int light_readings_recorded = 0;
 
     const int GMT = -4;
+
+    const int latest_on_hour = 20;
+
+    const int earliest_on_hour = 7;
 
     char* controller_network_ssid;
 
