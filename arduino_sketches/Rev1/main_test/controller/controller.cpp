@@ -112,9 +112,12 @@ void controller::checkPump()
 
 void controller::checkLights()
 {
-    if (my_sensor.getLight() > MIN_LIGHT_THRESHOLD)
+    static int prev_min;
+
+    if (my_sensor.getLight() > MIN_LIGHT_THRESHOLD && rtc.getMinutes() != prev_min)
     {
         minutes_of_light += 1;
+        prev_min = rtc.getMinutes();
         // Serial.println("The light value is above the minimum light threshold.");
     }
     else
