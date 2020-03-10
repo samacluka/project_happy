@@ -10,20 +10,20 @@ actuator::actuator()
 
 void actuator::enablePump()
 {
-  analogWrite(PUMP_PIN, 255); 
+  digitalWrite(PUMP_PIN, HIGH); 
 }
 
 void actuator::disablePump()
 {
-  analogWrite(PUMP_PIN, 0);
+  digitalWrite(PUMP_PIN, LOW);
 }
 
 void actuator::enableLED()
 {
-  analogWrite(LED_PIN, 255);
+  digitalWrite(LED_PIN, HIGH);
 }
 
 void actuator::disableLED()
 {
-    analogWrite(LED_PIN, 0);
+   digitalWrite(LED_PIN, LOW);
 }

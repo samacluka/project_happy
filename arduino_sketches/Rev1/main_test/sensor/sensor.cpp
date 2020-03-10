@@ -36,15 +36,12 @@ void sensor::poll()
 
   humidity = dht.readHumidity();
 
-  // soil_moist = analogRead(SOIL_MOIST_PIN_1); 
-
   int moist_1 = analogRead(SOIL_MOIST_PIN_1);
   int moist_2 = analogRead(SOIL_MOIST_PIN_2);
   int moist_3 = analogRead(SOIL_MOIST_PIN_3);
 
   if (abs(moist_1-moist_2) > MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
     soil_moist[reading_num] = 0;
-    Serial.println("Moisture readings too variable. Moisture reading unavailable."); //Should we send special value in this case?
   }
   else if (abs(moist_1-moist_2) < MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
     soil_moist[reading_num] = (moist_1 + moist_2) / 2;
@@ -69,15 +66,13 @@ void sensor::poll()
 
   water_present = digitalRead(WATER_LEVEL_PIN);
 
-  // light = analogRead(LIGHT_SENSE_PIN);  
-
   int light_1 = analogRead(LIGHT_SENSE_PIN_1);
   int light_2 = analogRead(LIGHT_SENSE_PIN_2);
   int light_3 = analogRead(LIGHT_SENSE_PIN_3);
 
+
   if (abs(light_1-light_2) > LIGHT_DIFF_TOL && abs(light_1-light_3) > LIGHT_DIFF_TOL && abs(light_2-light_3) > LIGHT_DIFF_TOL) {
     light[reading_num] = 0;
-    Serial.println("Light readings too variable. Light reading unavailable."); //Should we send special value in this case?
   }
   else if (abs(light_1-light_2) < LIGHT_DIFF_TOL && abs(light_1-light_3) > LIGHT_DIFF_TOL && abs(light_2-light_3) > LIGHT_DIFF_TOL) {
     light[reading_num] = (light_1 + light_2) / 2;
@@ -91,6 +86,9 @@ void sensor::poll()
   else {
     light[reading_num] = (light_1 + light_2 + light_3)  / 3;
   }
+
+  Serial.println();
+  Serial.println();
 
   tmp = 0;
 

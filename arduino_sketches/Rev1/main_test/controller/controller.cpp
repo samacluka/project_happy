@@ -57,12 +57,7 @@ void controller::rtcSetEpoch()
         Serial.println(epoch);
         rtc.setEpoch(epoch);
         Serial.println("Epoch has been set");
-        Serial.println(rtc.getEpoch());
-        Serial.println();
     }
-
-    Serial.print("The epoch from rtc is:");
-    Serial.println(rtc.getEpoch());
 
     // Print date...
     // Serial.print(rtc.getDay());
@@ -73,11 +68,11 @@ void controller::rtcSetEpoch()
     // Serial.print("\t");
 
     // // Print Time
-    Serial.print(rtc.getHours());
-    Serial.print(":");
-    Serial.print(rtc.getMinutes());
-    Serial.print(":");
-    Serial.print(rtc.getSeconds());
+    // Serial.print(rtc.getHours());
+    // Serial.print(":");
+    // Serial.print(rtc.getMinutes());
+    // Serial.print(":");
+    // Serial.print(rtc.getSeconds());
 }
 
 void controller::checkPump() 
@@ -85,8 +80,6 @@ void controller::checkPump()
         //if the plant needs water and we have the water to do it
     if ((my_sensor.getSoilMoist() > soil_moisture_max_setpoint - ((soil_moisture_max_setpoint - soil_moisture_min_setpoint) / 3)) && my_sensor.getWaterLevel() && (pump_thread_active == 0))
     {   
-        
-        Serial.println("Soil is dry, water is present. Enabling pump.");
         my_communicator.sendToServer("The plant is being watered.", "success");        
         my_actuator.enablePump();
         pump_thread_active = 1;
@@ -118,11 +111,9 @@ void controller::checkLights()
     {
         minutes_of_light += 1;
         prev_min = rtc.getMinutes();
-        // Serial.println("The light value is above the minimum light threshold.");
     }
     else
     {
-        // Serial.println("The light value is below the minimum light threshold required.");
 
     }
 
@@ -152,7 +143,7 @@ void controller::checkLights()
         return;
     }
 
-    if (((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) < (light_hours_min_setpoint - minutes_of_light) && !light_thread_active) {
+    if (((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) < (light_hours_min_setpoint*60 - minutes_of_light) && !light_thread_active) {
         my_actuator.enableLED();
         light_start_time = millis();
         light_thread_active = 1;
@@ -162,8 +153,8 @@ void controller::checkLights()
 
 void controller::set_setpoints()
 {
-	light_hours_min_setpoint = my_communicator.getLightMax();
-	light_hours_max_setpoint = my_communicator.getLightMin();
+	light_hours_min_setpoint = my_communicator.getLightMin();
+	light_hours_max_setpoint = my_communicator.getLightMax();
 	soil_moisture_max_setpoint = my_communicator.getMoistureMax();
 	soil_moisture_min_setpoint = my_communicator.getMoistureMin();
 }

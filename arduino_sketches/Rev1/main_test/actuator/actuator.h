@@ -1,8 +1,8 @@
 #ifndef actuator_h
 #define actuator_h
 
-#define PUMP_PIN A2
-#define LED_PIN A3
+#define PUMP_PIN 11
+#define LED_PIN 12
 
 class actuator
 {
