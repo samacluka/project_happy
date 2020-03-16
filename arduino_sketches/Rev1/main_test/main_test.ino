@@ -28,16 +28,18 @@ controller my_controller;
 TimedAction sensorAction = TimedAction(1 * 500, sensorState);
 TimedAction pumpAction = TimedAction(500, pump);
 TimedAction lightAction = TimedAction(1000, light);
-TimedAction httpPUTAction = TimedAction(10 * 1000, httpPUT);
-TimedAction httpGETAction = TimedAction(20 * 1000, httpGET);
+TimedAction httpPUTAction = TimedAction(30 * 1000, httpPUT);
+TimedAction httpGETAction = TimedAction(60 * 1000, httpGET);
 
 /*----------------------------------------- MAIN -----------------------------------------*/
 
 void setup()
 {   
     Serial.begin(9600);
-    my_controller.init(SECRET_SSID, SECRET_PASS);
+//    my_controller.init("JTOTPC-2.4", "26C741F5");
+    my_controller.init("iPhone", "AbbyRocks");
     pinMode(LED_BUILTIN, OUTPUT);
+    httpGET();
 }
 
 void loop()
@@ -91,7 +93,7 @@ void sensorState()
 }
 
 void httpPUT() {
-    my_controller.my_communicator.sendToServer(my_controller.my_sensor.getTemperature(), my_controller.my_sensor.getHumidity(), my_controller.my_sensor.getSoilMoist(), my_controller.my_sensor.getWaterLevel(), my_controller.my_sensor.getLight());
+    my_controller.my_communicator.sendToServer(my_controller.my_sensor.getTemperature(), my_controller.my_sensor.getHumidity(), my_controller.my_sensor.getSoilMoist(), my_controller.my_sensor.getWaterLevel(), my_controller.get_light_hours_data());
 }
 
 void httpGET() {

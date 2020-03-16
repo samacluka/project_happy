@@ -9,6 +9,11 @@ communication::communication()
 
 void communication::setup(char* ssid_in, char* password_in)
 {
+	Serial.print("SSID: ");
+	Serial.println(ssid_in);
+	Serial.print("Pass: ");
+	Serial.println(password_in);
+	// Serial.println();
 	ssid = ssid_in;
 	password = password_in;
 
@@ -23,7 +28,7 @@ void communication::setup(char* ssid_in, char* password_in)
     Serial.print("server in setup: ");
     Serial.println(server);
 
-	while (status != WL_CONNECTED) {
+	while (WiFi.status() != WL_CONNECTED) {
 		Serial.print("Attempting to connect to SSID: ");
 		Serial.println(ssid);
 		status  = WiFi.begin(ssid, password);
@@ -76,10 +81,10 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 	int content_length;
 	if (return_val) {
 		if(isnan(temperature) || isnan(humidity)) {
-			content_length = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, 0., humString, 0., moistString, moisture, lightString, light, pumpString, water);
+			content_length = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%f%s%d", plantIDString, plantID, tempString, 0., humString, 0., moistString, moisture, lightString, light, pumpString, water);
 		}
 		else {
-			content_length = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%d%s%d", plantIDString, plantID, tempString, temperature, humString, humidity, moistString, moisture, lightString, light, pumpString, water);
+			content_length = sprintf(dataString, "%s%s%s%f%s%f%s%d%s%f%s%d", plantIDString, plantID, tempString, temperature, humString, humidity, moistString, moisture, lightString, light, pumpString, water);
 		}
 		sprintf(conlenString, "Content-Length: %d", content_length);
 		sprintf(hostString, "Host: %s", server);

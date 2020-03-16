@@ -8,9 +8,9 @@ void controller::init(char* ssid, char* pass)
 
     my_communicator.setup(ssid, pass);
 
-	// controller_network_ssid = ssid;
+	controller_network_ssid = ssid;
 
-	// controller_network_password = pass;
+	controller_network_password = pass;
 
     pinMode(WATER_LED_PIN, OUTPUT);
 
@@ -21,6 +21,12 @@ void controller::init(char* ssid, char* pass)
     Serial.println("Set epoch successfully");
 
     my_communicator.sendToServer("System initialized succesfully.", "success");  
+
+    char epochString[100];
+
+    sprintf(epochString, "RTC set to: %d:%d.", rtc.getHours(),rtc.getMinutes());
+
+    my_communicator.sendToServer(epochString,"success");
 }
 
 void controller::rtcSetEpoch()
@@ -88,7 +94,7 @@ void controller::checkPump()
     else if (pump_thread_active)
     {   
         my_sensor.poll();
-        if (!my_sensor.getWaterLevel() || !(my_sensor.getSoilMoist() > soil_moisture_max_setpoint - ((soil_moisture_max_setpoint - soil_moisture_max_setpoint) / 3)))
+        if (!my_sensor.getWaterLevel() || !(my_sensor.getSoilMoist() > (soil_moisture_max_setpoint - ((soil_moisture_max_setpoint - soil_moisture_min_setpoint) / 3))))
         {   
             my_actuator.disablePump();
             pump_thread_active = 0;
@@ -105,9 +111,8 @@ void controller::checkPump()
 
 void controller::checkLights()
 {
-    static int prev_min;
 
-    if (my_sensor.getLight() > MIN_LIGHT_THRESHOLD && rtc.getMinutes() != prev_min)
+    if (((my_sensor.getLight() > MIN_LIGHT_THRESHOLD) || light_thread_active) && rtc.getMinutes() != prev_min)
     {
         minutes_of_light += 1;
         prev_min = rtc.getMinutes();
@@ -121,9 +126,11 @@ void controller::checkLights()
         minutes_of_light = 0;
     } 
 
-    light_hours_data = minutes_of_light/60;
+    light_hours_data = minutes_of_light/60.;
 
-    if (rtc.getHours() < earliest_on_hour || rtc.getHours() > latest_on_hour) // check if it is too early or late to be turning on the lights
+    // Serial.println(((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) < (light_hours_min_setpoint*60 - minutes_of_light));
+
+    if (rtc.getHours() < earliest_on_hour || rtc.getHours() > latest_on_hour || ((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) > (light_hours_min_setpoint*60 - minutes_of_light)) // check if it is too early or late to be turning on the lights
     {
         Serial.print("It is only");
         Serial.print(rtc.getHours());
@@ -169,7 +176,7 @@ void controller::waterIndicatorOff()
 	digitalWrite(WATER_LED_PIN, 0);
 }
 
-int controller::get_light_hours_data()
+float controller::get_light_hours_data()
 {
     return light_hours_data;
 }

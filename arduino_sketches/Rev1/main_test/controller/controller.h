@@ -35,7 +35,7 @@ class controller
 
     void waterIndicatorOff();
 
-    int get_light_hours_data();
+    float get_light_hours_data();
 
     sensor my_sensor;
 
@@ -56,8 +56,10 @@ class controller
 
     int soil_moisture_max_setpoint;
 
+    int prev_min;
+
     /* Control data used to determine actuation. Updated by sensors. Sent to server via put requests */
-    int light_hours_data;
+    float light_hours_data;
 
     int water_applied_data;
 

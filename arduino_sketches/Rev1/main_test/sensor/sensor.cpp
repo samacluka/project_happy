@@ -87,9 +87,6 @@ void sensor::poll()
     light[reading_num] = (light_1 + light_2 + light_3)  / 3;
   }
 
-  Serial.println();
-  Serial.println();
-
   tmp = 0;
 
   for (int i = 0; i < NUM_STORED_POINTS; i++) {
