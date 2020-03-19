@@ -129,7 +129,8 @@ void controller::checkLights()
     light_hours_data = minutes_of_light/60.;
 
     Serial.print("light value in checkLights: ");
-    Serial.println(light);
+    Serial.println(light_hours_data);
+    Serial.println(minutes_of_light);
 
     // Serial.println(((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) < (light_hours_min_setpoint*60 - minutes_of_light));
 
