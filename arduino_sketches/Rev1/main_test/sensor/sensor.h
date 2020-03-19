@@ -12,7 +12,7 @@
 #define LIGHT_SENSE_PIN_1 A0
 #define LIGHT_SENSE_PIN_2 A1
 #define LIGHT_SENSE_PIN_3 A2
-#define MOIST_DIFF_TOL 30 // max difference allowed between sensor readings
+#define MOIST_DIFF_TOL 90 // max difference allowed between sensor readings
 #define LIGHT_DIFF_TOL 90
 #define NUM_STORED_POINTS 30
 #define SOIL_MOIST_MAX 800
