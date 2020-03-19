@@ -26,7 +26,7 @@ public:
 	void setup(char* ssid, char* password);
 	void setServerID(char*  serverID);
 	void printWiFiStatus();
-	void sendToServer(float temperature, float humidity, int moisture, int water, int light);
+	void sendToServer(float temperature, float humidity, int moisture, int water, float light);
     void sendToServer(char* message, char* type);
 	void getFromServer();
 	void getPlantId();

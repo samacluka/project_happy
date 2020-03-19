@@ -57,7 +57,7 @@ void communication::printWiFiStatus()
 	Serial.println(" dBm");
 }
 
-void communication::sendToServer(float temperature, float humidity, int moisture, int water, int light)
+void communication::sendToServer(float temperature, float humidity, int moisture, int water, float light)
 {
 	char* plantIDString = "plantid=";
 	char* tempString = "&temperature=";
