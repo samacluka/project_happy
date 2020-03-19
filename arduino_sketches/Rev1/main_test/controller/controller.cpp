@@ -128,6 +128,9 @@ void controller::checkLights()
 
     light_hours_data = minutes_of_light/60.;
 
+    Serial.print("light value in checkLights: ");
+    Serial.println(light);
+
     // Serial.println(((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) < (light_hours_min_setpoint*60 - minutes_of_light));
 
     if (rtc.getHours() < earliest_on_hour || rtc.getHours() > latest_on_hour || ((latest_on_hour - rtc.getHours()) * 60 - rtc.getMinutes()) > (light_hours_min_setpoint*60 - minutes_of_light)) // check if it is too early or late to be turning on the lights

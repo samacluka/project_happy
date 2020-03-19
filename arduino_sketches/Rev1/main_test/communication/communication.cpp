@@ -70,6 +70,9 @@ void communication::sendToServer(float temperature, float humidity, int moisture
 	char conlenString[30];
 	char hostString[50];
 
+	Serial.print("light value in sendToServer: ");
+	Serial.println(light);
+
 	// Check that WiFi is still connected
 	if (WiFi.status() != WL_CONNECTED) {
 		setup(ssid, password);
