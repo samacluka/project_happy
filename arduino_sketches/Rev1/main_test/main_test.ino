@@ -93,7 +93,7 @@ void sensorState()
 }
 
 void httpPUT() {
-    my_controller.my_communicator.sendToServer(my_controller.my_sensor.getTemperature(), my_controller.my_sensor.getHumidity(), (my_controller.my_sensor.getSoilMoistPercentage(), my_controller.my_sensor.getWaterLevel(), my_controller.get_light_hours_data());
+    my_controller.my_communicator.sendToServer(my_controller.my_sensor.getTemperature(), my_controller.my_sensor.getHumidity(), (my_controller.my_sensor.getSoilMoist(), my_controller.my_sensor.getWaterLevel(), my_controller.get_light_hours_data());
 }
 
 void httpGET() {
