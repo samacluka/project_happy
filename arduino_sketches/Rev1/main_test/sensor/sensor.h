@@ -15,6 +15,8 @@
 #define MOIST_DIFF_TOL 30 // max difference allowed between sensor readings
 #define LIGHT_DIFF_TOL 90
 #define NUM_STORED_POINTS 30
+#define SOIL_MOIST_MAX 800
+#define SOIL_MOIST_MIN 400
 
 class sensor
 {

@@ -36,8 +36,8 @@ TimedAction httpGETAction = TimedAction(60 * 1000, httpGET);
 void setup()
 {   
     Serial.begin(9600);
-//    my_controller.init("JTOTPC-2.4", "26C741F5");
-    my_controller.init("iPhone", "AbbyRocks");
+    my_controller.init("JTOTPC-2.4", "26C741F5"); // HELENA
+//    my_controller.init("iPhone", "AbbyRocks"); // HASSAN
     pinMode(LED_BUILTIN, OUTPUT);
     httpGET();
 }
@@ -93,7 +93,7 @@ void sensorState()
 }
 
 void httpPUT() {
-    my_controller.my_communicator.sendToServer(my_controller.my_sensor.getTemperature(), my_controller.my_sensor.getHumidity(), my_controller.my_sensor.getSoilMoist(), my_controller.my_sensor.getWaterLevel(), my_controller.get_light_hours_data());
+    my_controller.my_communicator.sendToServer(my_controller.my_sensor.getTemperature(), my_controller.my_sensor.getHumidity(), (my_controller.my_sensor.getSoilMoistPercentage(), my_controller.my_sensor.getWaterLevel(), my_controller.get_light_hours_data());
 }
 
 void httpGET() {

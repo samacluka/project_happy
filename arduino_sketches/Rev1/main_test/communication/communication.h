@@ -13,7 +13,8 @@ private:
 	int status;
 	char* ssid;
 	char* password;
-    char* plantID = "5e6514ed076bf20017e21c25";
+    // char* plantID = "5e6514ed076bf20017e21c25"; // HASSAN
+    char* plantID = "5e6fc0cce118d400175f8c3a"; // HELENA
 	const char* plantid;
 	int moisture_setpoint_max;
 	int moisture_setpoint_min;

@@ -86,7 +86,7 @@ void controller::checkPump()
         //if the plant needs water and we have the water to do it
     if ((my_sensor.getSoilMoist() > soil_moisture_max_setpoint - ((soil_moisture_max_setpoint - soil_moisture_min_setpoint) / 3)) && my_sensor.getWaterLevel() && (pump_thread_active == 0))
     {   
-        my_communicator.sendToServer("The plant is being watered.", "success");        
+        // my_communicator.sendToServer("The plant is being watered.", "success");        
         my_actuator.enablePump();
         pump_thread_active = 1;
         pump_start_time = millis();
