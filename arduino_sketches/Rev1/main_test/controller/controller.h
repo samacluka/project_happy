@@ -8,8 +8,9 @@
 #include "communication.h"
 
 #define MIN_LIGHT_THRESHOLD 470
-#define ALLOWED_PUMPING_TIME 5000
+#define ALLOWED_PUMPING_TIME 300
 #define ALLOWED_LED_TIME 20000
+#define MAX_PUMP_PER_DAY 600000
 
 #define WATER_LED_PIN 5
 
@@ -82,6 +83,10 @@ class controller
     int light_thread_active = 0;
 
     int minutes_of_light = 0;
+
+    int seconds_of_pumping = 0;
+
+    int time_since_last_pump;
 
     int total_minutes_of_light_today = 0;
 

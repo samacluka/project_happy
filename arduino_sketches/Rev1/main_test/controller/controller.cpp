@@ -83,8 +83,19 @@ void controller::rtcSetEpoch()
 
 void controller::checkPump() 
 {
-        //if the plant needs water and we have the water to do it
-    if (my_sensor.getSoilMoist() < ((soil_moisture_min_setpoint + soil_moisture_max_setpoint) / 2) && my_sensor.getWaterLevel() && (pump_thread_active == 0))
+    if (rtc.getHours() == 0 && seconds_of_pumping != 0)
+    {
+        seconds_of_pumping = 0;
+    } 
+
+    //if the plant needs water and we have the water to do it
+    if (seconds_of_pumping >= MAX_PUMP_PER_DAY) // 5 minutes
+    {
+         my_communicator.sendToServer("You have pumped for longer than 10 minutes today, please check your sensors for accuracy.", "danger");   
+        return;
+    }
+
+    if (my_sensor.getSoilMoist() < ((soil_moisture_min_setpoint + soil_moisture_max_setpoint) / 2) && my_sensor.getWaterLevel() && (pump_thread_active == 0) && (millis() - time_since_last_pump) >= 600000)
     {   
         // my_communicator.sendToServer("The plant is being watered.", "success");        
         my_actuator.enablePump();
@@ -94,19 +105,28 @@ void controller::checkPump()
     else if (pump_thread_active)
     {   
         my_sensor.poll();
-        if (!my_sensor.getWaterLevel() || my_sensor.getSoilMoist() > ((soil_moisture_max_setpoint + soil_moisture_min_setpoint) / 2))
+        if (my_sensor.getSoilMoist() > ((soil_moisture_max_setpoint + soil_moisture_min_setpoint) / 2))
         {   
             my_actuator.disablePump();
             pump_thread_active = 0;
+            time_since_last_pump = millis();
+        }
+        else if (!my_sensor.getWaterLevel())
+        {
+            my_communicator.sendToServer("Pumped disabled due to empty resevoir. Please check resevoir levels.", "warning");   
+            my_actuator.disablePump();
+            pump_thread_active = 0;
+            time_since_last_pump = millis();
         }
         else if ( (millis() - pump_start_time) >  ALLOWED_PUMPING_TIME)
         {  
             my_actuator.disablePump();
             pump_thread_active = 0;
+            seconds_of_pumping = seconds_of_pumping + (millis() - pump_start_time);
+            time_since_last_pump = millis();
         }
     
     }
-
 }
 
 void controller::checkLights()
