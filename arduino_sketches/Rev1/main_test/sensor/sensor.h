@@ -12,7 +12,7 @@
 #define LIGHT_SENSE_PIN_1 A0
 #define LIGHT_SENSE_PIN_2 A1
 #define LIGHT_SENSE_PIN_3 A2
-#define MOIST_DIFF_TOL 20 // max difference allowed between sensor readings
+#define MOIST_DIFF_TOL 15 // max difference allowed between sensor readings
 #define LIGHT_DIFF_TOL 90
 #define NUM_STORED_POINTS 30
 
@@ -35,6 +35,10 @@ class sensor
 	  const float max_moist_1_reading = 806;
     const float max_moist_2_reading = 794;
     const float max_moist_3_reading = 798;
+
+    const float min_moist_1_reading = 405;
+    const float min_moist_2_reading = 395;
+    const float min_moist_3_reading = 397;
 
     float temperature;
 
