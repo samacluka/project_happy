@@ -35,6 +35,10 @@ class controller
 
     float get_light_hours_data();
 
+    int get_water_level_message_status();
+
+    void set_water_level_message_status(int status);
+
     sensor my_sensor;
 
     actuator my_actuator;
@@ -92,6 +96,8 @@ class controller
     char* controller_network_ssid;
 
     char* controller_network_password;
+
+    int water_level_message_sent = 0;
 };
 
 #endif

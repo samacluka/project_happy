@@ -70,12 +70,18 @@ void sensorState()
     my_controller.my_sensor.poll();
 
     if (my_controller.my_sensor.getWaterLevel() == 0)
-    {
+    {   
+        if (my_controller.get_water_level_message_status() == 0)
+        {
+            my_controller.my_communicator.sendToServer("Your water resevoir is empty, please refill.", "primary");
+            my_controller.set_water_level_message_status(1);
+        }
         my_controller.waterIndicatorOn();
     }
     else
     {
         my_controller.waterIndicatorOff();
+        my_controller.set_water_level_message_status(0);
     }
     
 //        Serial.print("temperature = ");

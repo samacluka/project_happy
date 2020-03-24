@@ -180,3 +180,13 @@ float controller::get_light_hours_data()
 {
     return light_hours_data;
 }
+
+int controller::get_water_level_message_status()
+{
+    return water_level_message_sent;
+}
+
+void controller::set_water_level_message_status(int status)
+{
+   water_level_message_sent = status;
+}
