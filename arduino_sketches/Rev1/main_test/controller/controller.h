@@ -7,8 +7,6 @@
 #include "actuator.h"
 #include "communication.h"
 
-#define DRY_SOIL_MOISTURE 798
-#define WET_SOIL_MOISTURE 395
 #define MIN_LIGHT_THRESHOLD 470
 #define ALLOWED_PUMPING_TIME 5000
 #define ALLOWED_LED_TIME 20000

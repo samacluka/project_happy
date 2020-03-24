@@ -12,11 +12,9 @@
 #define LIGHT_SENSE_PIN_1 A0
 #define LIGHT_SENSE_PIN_2 A1
 #define LIGHT_SENSE_PIN_3 A2
-#define MOIST_DIFF_TOL 90 // max difference allowed between sensor readings
+#define MOIST_DIFF_TOL 20 // max difference allowed between sensor readings
 #define LIGHT_DIFF_TOL 90
 #define NUM_STORED_POINTS 30
-#define SOIL_MOIST_MAX 800
-#define SOIL_MOIST_MIN 400
 
 class sensor
 {
@@ -34,7 +32,10 @@ class sensor
     void setTemperatureZero();
     void setHumidityZero(); 
   private:
-	
+	  const float max_moist_1_reading = 806;
+    const float max_moist_2_reading = 794;
+    const float max_moist_3_reading = 798;
+
     float temperature;
 
   	float humidity;

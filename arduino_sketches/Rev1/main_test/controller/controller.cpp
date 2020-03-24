@@ -84,7 +84,7 @@ void controller::rtcSetEpoch()
 void controller::checkPump() 
 {
         //if the plant needs water and we have the water to do it
-    if ((my_sensor.getSoilMoist() > soil_moisture_max_setpoint - ((soil_moisture_max_setpoint - soil_moisture_min_setpoint) / 3)) && my_sensor.getWaterLevel() && (pump_thread_active == 0))
+    if (my_sensor.getSoilMoist() < ((soil_moisture_min_setpoint + soil_moisture_max_setpoint) / 2) && my_sensor.getWaterLevel() && (pump_thread_active == 0))
     {   
         // my_communicator.sendToServer("The plant is being watered.", "success");        
         my_actuator.enablePump();
@@ -94,7 +94,7 @@ void controller::checkPump()
     else if (pump_thread_active)
     {   
         my_sensor.poll();
-        if (!my_sensor.getWaterLevel() || !(my_sensor.getSoilMoist() > (soil_moisture_max_setpoint - ((soil_moisture_max_setpoint - soil_moisture_min_setpoint) / 3))))
+        if (!my_sensor.getWaterLevel() || my_sensor.getSoilMoist() > ((soil_moisture_max_setpoint + soil_moisture_min_setpoint) / 2))
         {   
             my_actuator.disablePump();
             pump_thread_active = 0;
@@ -116,10 +116,6 @@ void controller::checkLights()
     {
         minutes_of_light += 1;
         prev_min = rtc.getMinutes();
-    }
-    else
-    {
-
     }
 
     if (rtc.getHours() == 0) {

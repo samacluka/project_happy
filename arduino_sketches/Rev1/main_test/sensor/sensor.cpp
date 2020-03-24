@@ -40,20 +40,25 @@ void sensor::poll()
   int moist_2 = analogRead(SOIL_MOIST_PIN_2);
   int moist_3 = analogRead(SOIL_MOIST_PIN_3);
 
-  if (abs(moist_1-moist_2) > MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
+
+  int moist_1_percentage = ((max_moist_1_reading - moist_1) / max_moist_1_reading) * 100;
+  int moist_2_percentage = ((max_moist_2_reading - moist_2) / max_moist_2_reading) * 100;
+  int moist_3_percentage = ((max_moist_3_reading - moist_3) / max_moist_3_reading) * 100;
+
+  if (abs(moist_1_percentage-moist_2_percentage) > MOIST_DIFF_TOL && abs(moist_1_percentage-moist_3_percentage) > MOIST_DIFF_TOL && abs(moist_2_percentage-moist_3_percentage) > MOIST_DIFF_TOL) {
     soil_moist[reading_num] = 0;
   }
-  else if (abs(moist_1-moist_2) < MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
-    soil_moist[reading_num] = (moist_1 + moist_2) / 2;
+  else if (abs(moist_1_percentage-moist_2_percentage) < MOIST_DIFF_TOL && abs(moist_1_percentage-moist_3_percentage) > MOIST_DIFF_TOL && abs(moist_2_percentage-moist_3_percentage) > MOIST_DIFF_TOL) {
+    soil_moist[reading_num] = (moist_1_percentage + moist_2_percentage) / 2;
   }
-  else if (abs(moist_1-moist_2) > MOIST_DIFF_TOL && abs(moist_1-moist_3) < MOIST_DIFF_TOL && abs(moist_2-moist_3) > MOIST_DIFF_TOL) {
-    soil_moist[reading_num] = (moist_1 + moist_3) / 2;
+  else if (abs(moist_1_percentage-moist_2_percentage) > MOIST_DIFF_TOL && abs(moist_1_percentage-moist_3_percentage) < MOIST_DIFF_TOL && abs(moist_2_percentage-moist_3_percentage) > MOIST_DIFF_TOL) {
+    soil_moist[reading_num] = (moist_1_percentage + moist_3_percentage) / 2;
   }
-  else if (abs(moist_1-moist_2) > MOIST_DIFF_TOL && abs(moist_1-moist_3) > MOIST_DIFF_TOL && abs(moist_2-moist_3) < MOIST_DIFF_TOL) {
-    soil_moist[reading_num] = (moist_2 + moist_3) / 2;
+  else if (abs(moist_1_percentage-moist_2_percentage) > MOIST_DIFF_TOL && abs(moist_1_percentage-moist_3) > MOIST_DIFF_TOL && abs(moist_2_percentage-moist_3_percentage) < MOIST_DIFF_TOL) {
+    soil_moist[reading_num] = (moist_2_percentage + moist_3_percentage) / 2;
   }
   else {
-    soil_moist[reading_num] = (moist_1 + moist_2 + moist_3)  / 3;
+    soil_moist[reading_num] = (moist_1_percentage + moist_2_percentage + moist_3_percentage)  / 3;
   }
 
   int tmp = 0;
