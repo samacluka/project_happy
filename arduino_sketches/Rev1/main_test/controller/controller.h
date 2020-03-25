@@ -8,7 +8,7 @@
 #include "communication.h"
 
 #define MIN_LIGHT_THRESHOLD 470
-#define ALLOWED_PUMPING_TIME 300
+#define ALLOWED_PUMPING_TIME 15000
 #define ALLOWED_LED_TIME 20000
 #define MAX_PUMP_PER_DAY 600000
 
