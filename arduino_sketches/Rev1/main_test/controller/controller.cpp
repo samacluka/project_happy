@@ -85,13 +85,16 @@ void controller::checkPump()
 {
     if (rtc.getHours() == 0 && seconds_of_pumping != 0)
     {
-        seconds_of_pumping = 0;
+        char my_message[50];
+        sprintf(my_message, "Your system received %d seconds of pumping time yesterday.", seconds_of_pumping);
+        my_communicator.sendToServer(my_message, "light");
+        seconds_of_pumping = 1;
     } 
 
     //if the plant needs water and we have the water to do it
     if (seconds_of_pumping >= MAX_PUMP_PER_DAY) // 5 minutes
     {
-         my_communicator.sendToServer("You have pumped for longer than 10 minutes today, please check your sensors for accuracy.", "danger");   
+        my_communicator.sendToServer("You have pumped for longer than 10 minutes today, please check your sensors for accuracy.", "danger");   
         return;
     }
 
@@ -138,7 +141,10 @@ void controller::checkLights()
         prev_min = rtc.getMinutes();
     }
 
-    if (rtc.getHours() == 0) {
+    if (rtc.getHours() == 0 && minutes_of_light != 0) {
+        char my_message[50];
+        sprintf(my_message, "Your system received %d minutes of light yesterday.", minutes_of_light);
+        my_communicator.sendToServer(my_message, "light");
         minutes_of_light = 0;
     } 
 
