@@ -25,11 +25,11 @@ void httpGET();
 
 controller my_controller;
 
-TimedAction sensorAction = TimedAction(1 * 500, sensorState);
+TimedAction sensorAction = TimedAction(500, sensorState);
 TimedAction pumpAction = TimedAction(500, pump);
 TimedAction lightAction = TimedAction(1000, light);
-TimedAction httpPUTAction = TimedAction(30 * 1000, httpPUT);
-TimedAction httpGETAction = TimedAction(60 * 1000, httpGET);
+TimedAction httpPUTAction = TimedAction(5 * 60 * 1000, httpPUT);
+TimedAction httpGETAction = TimedAction(1 * 60 * 1000, httpGET);
 
 /*----------------------------------------- MAIN -----------------------------------------*/
 
