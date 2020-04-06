@@ -88,7 +88,7 @@ void controller::checkPump()
         char my_message[50];
         sprintf(my_message, "Your system received %d seconds of pumping time yesterday.", seconds_of_pumping);
         my_communicator.sendToServer(my_message, "light");
-        seconds_of_pumping = 1;
+        seconds_of_pumping = 0;
     } 
 
     //if the plant needs water and we have the water to do it
